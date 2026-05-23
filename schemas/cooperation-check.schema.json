@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/cooperation-check.schema.json",
+  "title": "Cooperation Check",
+  "type": "object",
+  "required": ["check_id", "participants", "shared_upside", "defection_risk", "stability", "recommendation"],
+  "properties": {
+    "check_id": {
+      "type": "string"
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "goal", "risk"],
+        "properties": {
+          "name": { "type": "string" },
+          "goal": { "type": "string" },
+          "risk": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "shared_upside": {
+      "type": "string"
+    },
+    "defection_risk": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "stability": {
+      "type": "string",
+      "enum": ["unstable", "fragile", "stable"]
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": ["wait", "clarify", "renegotiate", "commit", "retreat"]
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
