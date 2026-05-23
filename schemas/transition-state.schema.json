@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/transition-state.schema.json",
+  "title": "Transition State",
+  "type": "object",
+  "required": [
+    "state_id",
+    "name",
+    "summary",
+    "tension",
+    "cause",
+    "transition_direction",
+    "cooperation_risk",
+    "recommended_posture"
+  ],
+  "properties": {
+    "state_id": {
+      "type": "string",
+      "description": "Stable identifier for the transition state."
+    },
+    "name": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "tension": {
+      "type": "string"
+    },
+    "cause": {
+      "type": "string"
+    },
+    "transition_direction": {
+      "type": "string"
+    },
+    "cooperation_risk": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "recommended_posture": {
+      "type": "string",
+      "enum": ["wait", "clarify", "stabilize", "negotiate", "commit", "retreat"]
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
