@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/tip-record.schema.json",
+  "title": "TIP Record",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "status",
+    "state",
+    "tension",
+    "cause",
+    "transition",
+    "cooperation",
+    "action"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "clarified", "blocked", "committed", "reviewed"]
+    },
+    "state": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "actors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "known_facts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tension": {
+      "type": "object",
+      "required": ["summary", "kind"],
+      "properties": {
+        "summary": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": ["ambiguity", "urgency", "conflict", "risk", "opportunity", "unmet_need", "contradiction"]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "cause": {
+      "type": "object",
+      "required": ["cause_type", "summary", "supporting_signals", "basis", "confidence"],
+      "properties": {
+        "cause_type": {
+          "type": "string",
+          "enum": ["intent", "constraint", "conflict", "opportunity", "risk", "permission"]
+        },
+        "summary": { "type": "string" },
+        "supporting_signals": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "basis": { "type": "string" },
+        "parent_cause": { "type": ["string", "null"] },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "transition": {
+      "type": "object",
+      "required": ["from", "to", "trigger", "reversibility", "expected_consequence"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "trigger": { "type": "string" },
+        "reversibility": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "expected_consequence": { "type": "string" },
+        "uncertainty": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "cooperation": {
+      "type": "object",
+      "required": ["participants", "shared_upside", "defection_risk", "stability", "recommendation"],
+      "properties": {
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "goal", "risk"],
+            "properties": {
+              "name": { "type": "string" },
+              "goal": { "type": "string" },
+              "risk": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "shared_upside": { "type": "string" },
+        "defection_risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["unstable", "fragile", "stable"]
+        },
+        "recommendation": {
+          "type": "string",
+          "enum": ["wait", "clarify", "renegotiate", "commit", "retreat"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "review_after": { "type": "string" },
+        "owner": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
