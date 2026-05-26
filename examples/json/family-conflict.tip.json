@@ -1,0 +1,60 @@
+{
+  "id": "tip.example.family_conflict",
+  "title": "Family conflict transition",
+  "status": "clarified",
+  "state": {
+    "summary": "Two family members argue about a practical decision.",
+    "actors": ["person A", "person B", "family system"],
+    "known_facts": ["both want the family to be okay", "each sees a different immediate priority"],
+    "constraints": ["emotional fatigue", "time pressure"]
+  },
+  "tension": {
+    "summary": "One person feels urgency while the other feels unheard.",
+    "kind": "conflict",
+    "severity": "medium"
+  },
+  "cause": {
+    "cause_type": "conflict",
+    "summary": "The surface topic hides a deeper need for safety, respect, and recognition.",
+    "supporting_signals": ["raised emotional tone", "repeated disagreement", "need to protect something important"],
+    "basis": "Observed communication pattern",
+    "parent_cause": null,
+    "confidence": 0.64
+  },
+  "transition": {
+    "from": "reactive argument",
+    "to": "shared problem definition",
+    "trigger": "recognition that both sides are protecting something",
+    "reversibility": "high",
+    "expected_consequence": "lower emotional pressure and clearer next step",
+    "uncertainty": "medium"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "person A",
+        "goal": "recognition of urgency",
+        "risk": "feeling blocked"
+      },
+      {
+        "name": "person B",
+        "goal": "recognition of concern",
+        "risk": "feeling pushed"
+      },
+      {
+        "name": "family system",
+        "goal": "stability and emotional safety",
+        "risk": "escalation"
+      }
+    ],
+    "shared_upside": "Both sides can protect what matters without humiliating each other.",
+    "defection_risk": "medium",
+    "stability": "fragile",
+    "recommendation": "renegotiate"
+  },
+  "action": {
+    "summary": "Pause and ask what both people are trying to protect right now.",
+    "review_after": "conversation de-escalation",
+    "owner": "both participants"
+  }
+}
