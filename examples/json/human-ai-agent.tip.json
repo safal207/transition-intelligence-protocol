@@ -1,0 +1,60 @@
+{
+  "id": "tip.example.human_ai_agent",
+  "title": "Human AI agent action readiness",
+  "status": "clarified",
+  "state": {
+    "summary": "A human asks an AI agent to perform an external action.",
+    "actors": ["human", "AI agent", "external recipient", "future reviewer"],
+    "known_facts": ["the human wants progress", "the agent has partial context"],
+    "constraints": ["tool action may affect external systems", "intent may be underspecified"]
+  },
+  "tension": {
+    "summary": "The user wants action, but the agent may not have enough verified context.",
+    "kind": "ambiguity",
+    "severity": "medium"
+  },
+  "cause": {
+    "cause_type": "intent",
+    "summary": "The human request creates intent, but the agent needs a clear basis before acting.",
+    "supporting_signals": ["explicit request", "external side effect"],
+    "basis": "User instruction plus safety boundary",
+    "parent_cause": null,
+    "confidence": 0.68
+  },
+  "transition": {
+    "from": "interpreted request",
+    "to": "verified action readiness",
+    "trigger": "possible external action",
+    "reversibility": "low",
+    "expected_consequence": "agent either acts safely or asks for missing context",
+    "uncertainty": "medium"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "human",
+        "goal": "useful execution",
+        "risk": "agent delay or misunderstanding"
+      },
+      {
+        "name": "AI agent",
+        "goal": "safe and honest execution",
+        "risk": "overclaiming readiness"
+      },
+      {
+        "name": "future reviewer",
+        "goal": "inspectable reason trail",
+        "risk": "untraceable action"
+      }
+    ],
+    "shared_upside": "The action becomes useful without hiding uncertainty.",
+    "defection_risk": "medium",
+    "stability": "fragile",
+    "recommendation": "clarify"
+  },
+  "action": {
+    "summary": "Ask for missing context or take the smallest clearly justified step.",
+    "review_after": "tool result or user confirmation",
+    "owner": "AI agent"
+  }
+}
