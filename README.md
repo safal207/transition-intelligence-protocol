@@ -25,6 +25,30 @@ Transition Intelligence asks a deeper sequence of questions:
 
 This makes the protocol useful for human-AI cooperation, agent safety, strategic decisions, startup pivots, conflict analysis, and any system where a wrong transition can create long-term damage.
 
+## v0.1 draft
+
+The first draft specification is available here:
+
+- [`spec/v0.1.md`](spec/v0.1.md)
+
+v0.1 defines the minimal **TIP Record** format:
+
+```text
+state + tension + cause + transition + cooperation -> action
+```
+
+A record is invalid if it contains an action without the reasoning chain that makes the action inspectable.
+
+## Validation
+
+TIP JSON examples can be checked with:
+
+```bash
+python scripts/validate_examples.py
+```
+
+See [`docs/validation.md`](docs/validation.md) for details.
+
 ## Intellectual frame
 
 The protocol is inspired by three ideas:
@@ -62,13 +86,17 @@ Action
 ```text
 transition-intelligence-protocol/
   README.md
+  spec/
+    v0.1.md
   docs/
     concept.md
     64-transition-states.md
     nash-cooperation.md
     cause-and-transition.md
     protocol-model.md
+    validation.md
   schemas/
+    tip-record.schema.json
     transition-state.schema.json
     cause.schema.json
     cooperation-check.schema.json
@@ -76,7 +104,13 @@ transition-intelligence-protocol/
     startup-decision.md
     human-ai-agent.md
     family-conflict.md
-  LICENSE
+    json/
+      startup-pivot.tip.json
+      human-ai-agent.tip.json
+      family-conflict.tip.json
+  scripts/
+    validate_examples.py
+  LICENSE.md
 ```
 
 ## Example use
@@ -108,7 +142,7 @@ Run one narrow pilot before changing the full product.
 
 Early conceptual foundation.
 
-Current goal: define a clean protocol vocabulary before implementation.
+Current goal: define a clean protocol vocabulary and minimal record format before implementation.
 
 ## License
 
