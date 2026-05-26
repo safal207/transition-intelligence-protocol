@@ -1,0 +1,60 @@
+{
+  "id": "tip.example.startup_pivot",
+  "title": "Startup pivot decision",
+  "status": "committed",
+  "state": {
+    "summary": "The product has early interest but weak retention.",
+    "actors": ["founder", "early users", "contributors"],
+    "known_facts": ["users show curiosity", "repeat usage is weak"],
+    "constraints": ["limited time", "unclear positioning"]
+  },
+  "tension": {
+    "summary": "Users understand the idea but do not return consistently.",
+    "kind": "unmet_need",
+    "severity": "high"
+  },
+  "cause": {
+    "cause_type": "constraint",
+    "summary": "The current product solves a broad problem, not an urgent narrow pain.",
+    "supporting_signals": ["weak retention", "unclear user habit"],
+    "basis": "Observed usage pattern",
+    "parent_cause": null,
+    "confidence": 0.72
+  },
+  "transition": {
+    "from": "broad productivity product",
+    "to": "narrow decision-support protocol",
+    "trigger": "retention weakness",
+    "reversibility": "medium",
+    "expected_consequence": "clearer value proposition",
+    "uncertainty": "medium"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "founder",
+        "goal": "focus",
+        "risk": "overbuilding"
+      },
+      {
+        "name": "early users",
+        "goal": "clear benefit",
+        "risk": "confusion"
+      },
+      {
+        "name": "contributors",
+        "goal": "stable direction",
+        "risk": "moving target"
+      }
+    ],
+    "shared_upside": "Sharper product category and easier validation.",
+    "defection_risk": "medium",
+    "stability": "fragile",
+    "recommendation": "clarify"
+  },
+  "action": {
+    "summary": "Run one narrow pilot before changing the whole product.",
+    "review_after": "pilot completion",
+    "owner": "founder"
+  }
+}
