@@ -1,5 +1,7 @@
 # Transition Intelligence Protocol
 
+[![Validate TIP examples](https://github.com/safal207/transition-intelligence-protocol/actions/workflows/validate.yml/badge.svg)](https://github.com/safal207/transition-intelligence-protocol/actions/workflows/validate.yml)
+
 **Transition Intelligence Protocol** is a framework for reasoning about state, tension, cause, transition, cooperation, and action.
 
 It treats decisions not as isolated outputs, but as **state transitions** that must be understood, justified, and tested for cooperative stability.
