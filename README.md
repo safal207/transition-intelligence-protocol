@@ -41,15 +41,22 @@ state + tension + cause + transition + cooperation -> action
 
 A record is invalid if it contains an action without the reasoning chain that makes the action inspectable.
 
-## Validation
+## Validation and CLI
 
-TIP JSON examples can be checked with:
+TIP JSON examples can be checked with either command:
 
 ```bash
 python scripts/validate_examples.py
+python -m tip validate examples/json/
 ```
 
-See [`docs/validation.md`](docs/validation.md) for details.
+Validate one record:
+
+```bash
+python -m tip validate examples/json/startup-pivot.tip.json
+```
+
+See [`docs/validation.md`](docs/validation.md) and [`docs/cli.md`](docs/cli.md) for details.
 
 ## Intellectual frame
 
@@ -91,6 +98,7 @@ transition-intelligence-protocol/
   spec/
     v0.1.md
   docs/
+    cli.md
     concept.md
     64-transition-states.md
     nash-cooperation.md
@@ -110,6 +118,10 @@ transition-intelligence-protocol/
       startup-pivot.tip.json
       human-ai-agent.tip.json
       family-conflict.tip.json
+  tip/
+    __init__.py
+    __main__.py
+    validator.py
   scripts/
     validate_examples.py
   LICENSE.md
