@@ -1,4 +1,4 @@
-name: Validate TIP protocol
+name: Validate protocol family
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate:
-    name: Validate records and validator
+    name: Validate records and validators
     runs-on: ubuntu-latest
 
     steps:
@@ -23,5 +23,8 @@ jobs:
       - name: Validate canonical TIP examples
         run: python -m tip validate examples/json/
 
-      - name: Test the validator
+      - name: Validate canonical IFP examples
+        run: python -m tip validate-ifp examples/ifp/
+
+      - name: Test protocol validators
         run: python -m unittest discover -s tests -v
