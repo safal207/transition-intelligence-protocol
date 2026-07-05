@@ -1,0 +1,11 @@
+{
+  "id": "tip.test.unsupported_status",
+  "title": "Unsupported lifecycle value",
+  "status": "pending",
+  "state": {"summary": "A record is being checked."},
+  "tension": {"summary": "The lifecycle value is unsupported.", "kind": "ambiguity", "severity": "medium"},
+  "cause": {"cause_type": "constraint", "summary": "The supplied value is outside the protocol vocabulary.", "supporting_signals": ["unknown lifecycle value"], "basis": "Protocol schema", "confidence": 0.9},
+  "transition": {"from": "unchecked record", "to": "checked record", "trigger": "validation", "reversibility": "high", "expected_consequence": "The unsupported value is reported.", "uncertainty": "low"},
+  "cooperation": {"participants": [{"name": "reviewer", "goal": "clear result", "risk": "false acceptance"}], "shared_upside": "A consistent protocol vocabulary.", "defection_risk": "low", "stability": "stable", "recommendation": "clarify"},
+  "action": {"summary": "Report the unsupported lifecycle value."}
+}
