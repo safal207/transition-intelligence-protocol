@@ -1,0 +1,27 @@
+{
+  "id": "tip.test.missing_cause",
+  "title": "Missing cause",
+  "status": "clarified",
+  "state": {"summary": "A decision requires clarification."},
+  "tension": {
+    "summary": "Information is incomplete.",
+    "kind": "ambiguity",
+    "severity": "medium"
+  },
+  "transition": {
+    "from": "unclear request",
+    "to": "clarified request",
+    "trigger": "context collection",
+    "reversibility": "high",
+    "expected_consequence": "A safer next action",
+    "uncertainty": "medium"
+  },
+  "cooperation": {
+    "participants": [{"name": "requester", "goal": "useful result", "risk": "misinterpretation"}],
+    "shared_upside": "Shared context.",
+    "defection_risk": "low",
+    "stability": "stable",
+    "recommendation": "clarify"
+  },
+  "action": {"summary": "Collect context."}
+}
