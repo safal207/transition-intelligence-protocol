@@ -1,0 +1,48 @@
+{
+  "id": "ifp.example.project_initialization",
+  "title": "Initialize the Transition Intelligence Protocol repository",
+  "status": "ready",
+  "subject": {
+    "kind": "software-project",
+    "name": "Transition Intelligence Protocol",
+    "initial_state": "Concept exists without a verified working repository",
+    "target_state": "Repository has a specification, examples, validation, and automated feedback"
+  },
+  "setup": {
+    "parameters": [
+      "public GitHub repository",
+      "Python 3.12 validation runtime",
+      "canonical JSON record schemas",
+      "GitHub Actions on main and pull requests"
+    ],
+    "assumptions": [
+      "canonical examples represent the current protocol vocabulary",
+      "the dependency-free validator covers the documented schema subset"
+    ],
+    "owner": "project maintainer"
+  },
+  "feedback": {
+    "method": "Run canonical record validation and validator self-tests",
+    "expected_signal": "Canonical records pass and intentionally invalid records fail",
+    "observed_signal": "Canonical records passed and negative fixtures were rejected for expected reasons",
+    "passed": true
+  },
+  "correction": {
+    "required": true,
+    "changes": [
+      "added semantic invariant checks",
+      "added negative fixtures",
+      "added validator self-tests",
+      "updated continuous integration workflow"
+    ]
+  },
+  "readiness": {
+    "ready": true,
+    "evidence": [
+      "schemas/tip-record.schema.json",
+      "tests/test_validator.py",
+      ".github/workflows/validate.yml"
+    ],
+    "next_protocol": "TIP"
+  }
+}
