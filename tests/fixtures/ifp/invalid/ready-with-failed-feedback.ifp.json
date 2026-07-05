@@ -1,0 +1,31 @@
+{
+  "id": "ifp.test.ready_with_failed_feedback",
+  "title": "Ready initialization with failed feedback",
+  "status": "ready",
+  "subject": {
+    "kind": "software-project",
+    "name": "Example project",
+    "initial_state": "Project is not checked",
+    "target_state": "Project has a verified starting state"
+  },
+  "setup": {
+    "parameters": ["repository created"],
+    "assumptions": ["validation command is available"],
+    "owner": "maintainer"
+  },
+  "feedback": {
+    "method": "Run validation",
+    "expected_signal": "Validation passes",
+    "observed_signal": "Validation failed",
+    "passed": false
+  },
+  "correction": {
+    "required": false,
+    "changes": []
+  },
+  "readiness": {
+    "ready": true,
+    "evidence": ["validation output"],
+    "next_protocol": "TIP"
+  }
+}
