@@ -1,0 +1,31 @@
+{
+  "id": "ifp.test.correction_without_changes",
+  "title": "Required correction without recorded changes",
+  "status": "corrected",
+  "subject": {
+    "kind": "software-project",
+    "name": "Example project",
+    "initial_state": "Project produced unexpected feedback",
+    "target_state": "Project has a corrected starting state"
+  },
+  "setup": {
+    "parameters": ["repository created"],
+    "assumptions": ["validation command is available"],
+    "owner": "maintainer"
+  },
+  "feedback": {
+    "method": "Run validation",
+    "expected_signal": "Validation passes",
+    "observed_signal": "Validation reported an error",
+    "passed": false
+  },
+  "correction": {
+    "required": true,
+    "changes": []
+  },
+  "readiness": {
+    "ready": false,
+    "evidence": [],
+    "next_protocol": null
+  }
+}
