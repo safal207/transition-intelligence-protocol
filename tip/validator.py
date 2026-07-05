@@ -28,35 +28,110 @@ def load_json(path: Path) -> Any:
         return json.load(file)
 
 
-def validate_required(schema: dict[str, Any], data: dict[str, Any], path: str = "$") -> list[str]:
-    """Validate required fields and enum values for the supported schema subset."""
+def _matches_type(value: Any, expected_type: str) -> bool:
+    type_checks = {
+        "object": lambda item: isinstance(item, dict),
+        "array": lambda item: isinstance(item, list),
+        "string": lambda item: isinstance(item, str),
+        "number": lambda item: isinstance(item, (int, float)) and not isinstance(item, bool),
+        "integer": lambda item: isinstance(item, int) and not isinstance(item, bool),
+        "boolean": lambda item: isinstance(item, bool),
+        "null": lambda item: item is None,
+    }
+    check = type_checks.get(expected_type)
+    return True if check is None else check(value)
+
+
+def _type_is_valid(value: Any, expected_type: Any) -> bool:
+    if isinstance(expected_type, str):
+        return _matches_type(value, expected_type)
+    if isinstance(expected_type, list):
+        return any(isinstance(item, str) and _matches_type(value, item) for item in expected_type)
+    return True
+
+
+def validate_schema_subset(
+    schema: dict[str, Any],
+    data: Any,
+    path: str = "$",
+) -> list[str]:
+    """Validate the dependency-free JSON Schema subset used by TIP."""
 
     errors: list[str] = []
+    expected_type = schema.get("type")
 
-    required = schema.get("required", [])
-    for key in required:
-        if key not in data:
-            errors.append(f"{path}: missing required field '{key}'")
+    if not _type_is_valid(data, expected_type):
+        errors.append(f"{path}: expected type {expected_type!r}")
+        return errors
 
-    properties = schema.get("properties", {})
-    for key, value in data.items():
-        child_schema = properties.get(key)
-        if not isinstance(child_schema, dict):
-            continue
+    enum_values = schema.get("enum")
+    if enum_values is not None and data not in enum_values:
+        errors.append(f"{path}: value {data!r} is not in {enum_values}")
 
-        expected_type = child_schema.get("type")
-        if expected_type == "object" and isinstance(value, dict):
-            errors.extend(validate_required(child_schema, value, f"{path}.{key}"))
-        elif expected_type == "array" and isinstance(value, list):
-            item_schema = child_schema.get("items")
-            if isinstance(item_schema, dict):
-                for index, item in enumerate(value):
-                    if isinstance(item, dict):
-                        errors.extend(validate_required(item_schema, item, f"{path}.{key}[{index}]"))
+    if isinstance(data, (int, float)) and not isinstance(data, bool):
+        minimum = schema.get("minimum")
+        maximum = schema.get("maximum")
+        if minimum is not None and data < minimum:
+            errors.append(f"{path}: value {data!r} is below minimum {minimum}")
+        if maximum is not None and data > maximum:
+            errors.append(f"{path}: value {data!r} is above maximum {maximum}")
 
-        enum_values = child_schema.get("enum")
-        if enum_values is not None and value not in enum_values:
-            errors.append(f"{path}.{key}: value '{value}' is not in {enum_values}")
+    if isinstance(data, dict):
+        required = schema.get("required", [])
+        for key in required:
+            if key not in data:
+                errors.append(f"{path}: missing required field '{key}'")
+
+        properties = schema.get("properties", {})
+        for key, value in data.items():
+            child_schema = properties.get(key)
+            if isinstance(child_schema, dict):
+                errors.extend(validate_schema_subset(child_schema, value, f"{path}.{key}"))
+
+    if isinstance(data, list):
+        item_schema = schema.get("items")
+        if isinstance(item_schema, dict):
+            for index, item in enumerate(data):
+                errors.extend(validate_schema_subset(item_schema, item, f"{path}[{index}]"))
+
+    return errors
+
+
+def validate_invariants(data: dict[str, Any]) -> list[str]:
+    """Validate semantic TIP rules that JSON shape alone cannot express."""
+
+    errors: list[str] = []
+    status = data.get("status")
+    cooperation = data.get("cooperation")
+    cause = data.get("cause")
+
+    if not isinstance(cooperation, dict):
+        return errors
+
+    recommendation = cooperation.get("recommendation")
+    defection_risk = cooperation.get("defection_risk")
+
+    if status == "blocked" and recommendation == "commit":
+        errors.append(
+            "$.cooperation.recommendation: blocked records cannot recommend 'commit'"
+        )
+
+    if defection_risk == "high" and recommendation == "commit":
+        errors.append(
+            "$.cooperation.recommendation: high defection risk cannot directly recommend 'commit'"
+        )
+
+    if isinstance(cause, dict):
+        confidence = cause.get("confidence")
+        if (
+            isinstance(confidence, (int, float))
+            and not isinstance(confidence, bool)
+            and confidence < 0.5
+            and recommendation not in {"wait", "clarify"}
+        ):
+            errors.append(
+                "$.cooperation.recommendation: cause confidence below 0.5 requires 'wait' or 'clarify'"
+            )
 
     return errors
 
@@ -72,10 +147,15 @@ def discover_tip_files(target: Path) -> list[Path]:
 
 
 def validate_file(path: Path, schema: dict[str, Any]) -> ValidationResult:
-    data = load_json(path)
-    if not isinstance(data, dict):
-        return ValidationResult(path, ["$: TIP record must be a JSON object"])
-    return ValidationResult(path, validate_required(schema, data))
+    try:
+        data = load_json(path)
+    except (OSError, json.JSONDecodeError) as exc:
+        return ValidationResult(path, [f"$: unable to read valid JSON: {exc}"])
+
+    errors = validate_schema_subset(schema, data)
+    if isinstance(data, dict):
+        errors.extend(validate_invariants(data))
+    return ValidationResult(path, errors)
 
 
 def validate_target(target: Path, schema_path: Path = DEFAULT_SCHEMA_PATH) -> list[ValidationResult]:
