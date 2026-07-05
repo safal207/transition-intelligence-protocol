@@ -1,0 +1,31 @@
+{
+  "id": "ifp.test.ready_without_evidence",
+  "title": "Ready initialization without evidence",
+  "status": "ready",
+  "subject": {
+    "kind": "software-project",
+    "name": "Example project",
+    "initial_state": "Project is not checked",
+    "target_state": "Project has a verified starting state"
+  },
+  "setup": {
+    "parameters": ["repository created"],
+    "assumptions": ["validation command is available"],
+    "owner": "maintainer"
+  },
+  "feedback": {
+    "method": "Run validation",
+    "expected_signal": "Validation passes",
+    "observed_signal": "Validation passed",
+    "passed": true
+  },
+  "correction": {
+    "required": false,
+    "changes": []
+  },
+  "readiness": {
+    "ready": true,
+    "evidence": [],
+    "next_protocol": "TIP"
+  }
+}
