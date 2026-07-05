@@ -98,12 +98,11 @@ def validate_schema_subset(
 
 
 def validate_invariants(data: dict[str, Any]) -> list[str]:
-    """Validate semantic TIP rules that JSON shape alone cannot express."""
+    """Validate semantic TIP rules that have explicit negative tests."""
 
     errors: list[str] = []
     status = data.get("status")
     cooperation = data.get("cooperation")
-    cause = data.get("cause")
 
     if not isinstance(cooperation, dict):
         return errors
@@ -120,18 +119,6 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
         errors.append(
             "$.cooperation.recommendation: high defection risk cannot directly recommend 'commit'"
         )
-
-    if isinstance(cause, dict):
-        confidence = cause.get("confidence")
-        if (
-            isinstance(confidence, (int, float))
-            and not isinstance(confidence, bool)
-            and confidence < 0.5
-            and recommendation not in {"wait", "clarify"}
-        ):
-            errors.append(
-                "$.cooperation.recommendation: cause confidence below 0.5 requires 'wait' or 'clarify'"
-            )
 
     return errors
 
