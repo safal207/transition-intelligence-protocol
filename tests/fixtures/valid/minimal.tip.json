@@ -1,0 +1,44 @@
+{
+  "id": "tip.test.valid_minimal",
+  "title": "Valid minimal TIP record",
+  "status": "clarified",
+  "state": {
+    "summary": "A decision requires clarification."
+  },
+  "tension": {
+    "summary": "The available information is incomplete.",
+    "kind": "ambiguity",
+    "severity": "medium"
+  },
+  "cause": {
+    "cause_type": "constraint",
+    "summary": "Required context is missing.",
+    "supporting_signals": ["unknown owner"],
+    "basis": "Current record",
+    "confidence": 0.7
+  },
+  "transition": {
+    "from": "unclear request",
+    "to": "clarified request",
+    "trigger": "context collection",
+    "reversibility": "high",
+    "expected_consequence": "A safer next action",
+    "uncertainty": "medium"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "requester",
+        "goal": "useful result",
+        "risk": "misinterpretation"
+      }
+    ],
+    "shared_upside": "A decision based on shared context.",
+    "defection_risk": "low",
+    "stability": "stable",
+    "recommendation": "clarify"
+  },
+  "action": {
+    "summary": "Collect the missing context."
+  }
+}
