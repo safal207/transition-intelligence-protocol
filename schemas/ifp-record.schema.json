@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/ifp-record.schema.json",
+  "title": "Initialization Feedback Protocol Record",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "status",
+    "subject",
+    "setup",
+    "feedback",
+    "correction",
+    "readiness"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "configured", "feedback_received", "corrected", "ready", "blocked"]
+    },
+    "subject": {
+      "type": "object",
+      "required": ["kind", "name", "initial_state", "target_state"],
+      "properties": {
+        "kind": {"type": "string"},
+        "name": {"type": "string"},
+        "initial_state": {"type": "string"},
+        "target_state": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "setup": {
+      "type": "object",
+      "required": ["parameters", "assumptions", "owner"],
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "owner": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "feedback": {
+      "type": "object",
+      "required": ["method", "expected_signal", "observed_signal", "passed"],
+      "properties": {
+        "method": {"type": "string"},
+        "expected_signal": {"type": "string"},
+        "observed_signal": {"type": "string"},
+        "passed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "correction": {
+      "type": "object",
+      "required": ["required", "changes"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "changes": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "readiness": {
+      "type": "object",
+      "required": ["ready", "evidence", "next_protocol"],
+      "properties": {
+        "ready": {"type": "boolean"},
+        "evidence": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "next_protocol": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
