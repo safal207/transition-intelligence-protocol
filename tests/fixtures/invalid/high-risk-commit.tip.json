@@ -1,0 +1,11 @@
+{
+  "id": "tip.test.high_risk_commit",
+  "title": "High cooperation risk with direct commitment",
+  "status": "clarified",
+  "state": {"summary": "Participants disagree about the transition."},
+  "tension": {"summary": "A direct commitment may break cooperation.", "kind": "conflict", "severity": "high"},
+  "cause": {"cause_type": "conflict", "summary": "Participant goals are not aligned.", "supporting_signals": ["unresolved disagreement"], "basis": "Participant feedback", "confidence": 0.85},
+  "transition": {"from": "unresolved disagreement", "to": "committed execution", "trigger": "direct decision", "reversibility": "low", "expected_consequence": "Cooperation may become unstable.", "uncertainty": "high"},
+  "cooperation": {"participants": [{"name": "participant-a", "goal": "move forward", "risk": "loss of trust"}, {"name": "participant-b", "goal": "resolve concerns", "risk": "being ignored"}], "shared_upside": "A mutually supported transition.", "defection_risk": "high", "stability": "unstable", "recommendation": "commit"},
+  "action": {"summary": "Commit before resolving the disagreement."}
+}
