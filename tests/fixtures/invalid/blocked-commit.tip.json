@@ -1,0 +1,11 @@
+{
+  "id": "tip.test.blocked_commit",
+  "title": "Blocked record recommending commitment",
+  "status": "blocked",
+  "state": {"summary": "The record lacks required approval."},
+  "tension": {"summary": "Execution is requested before approval.", "kind": "risk", "severity": "high"},
+  "cause": {"cause_type": "permission", "summary": "Required approval is absent.", "supporting_signals": ["approval not recorded"], "basis": "Protocol record", "confidence": 0.9},
+  "transition": {"from": "unapproved", "to": "executed", "trigger": "requested action", "reversibility": "low", "expected_consequence": "An unsupported transition.", "uncertainty": "low"},
+  "cooperation": {"participants": [{"name": "reviewer", "goal": "safe transition", "risk": "unsupported execution"}], "shared_upside": "A transition with evidence.", "defection_risk": "medium", "stability": "fragile", "recommendation": "commit"},
+  "action": {"summary": "Execute the transition."}
+}
