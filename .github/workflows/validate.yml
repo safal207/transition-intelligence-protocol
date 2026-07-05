@@ -1,4 +1,4 @@
-name: Validate TIP examples
+name: Validate TIP protocol
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate:
-    name: Validate JSON examples
+    name: Validate records and validator
     runs-on: ubuntu-latest
 
     steps:
@@ -20,5 +20,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Validate TIP examples
-        run: python scripts/validate_examples.py
+      - name: Validate canonical TIP examples
+        run: python -m tip validate examples/json/
+
+      - name: Test the validator
+        run: python -m unittest discover -s tests -v
