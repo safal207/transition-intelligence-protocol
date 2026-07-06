@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Callable
 
+from tip.handoff_validator import validate_ifp_to_tip_handoff
 from tip.ifp_validator import DEFAULT_IFP_SCHEMA_PATH, validate_ifp_target
 from tip.validator import DEFAULT_SCHEMA_PATH, ValidationResult, validate_target
 
@@ -54,16 +55,37 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to the IFP record JSON schema.",
     )
 
+    handoff_parser = subparsers.add_parser(
+        "validate-handoff",
+        help="Validate provenance across one ready IFP record and one TIP record.",
+    )
+    handoff_parser.add_argument(
+        "tip_record",
+        type=Path,
+        help="Path to the TIP record receiving the initialized state.",
+    )
+    handoff_parser.add_argument(
+        "ifp_record",
+        type=Path,
+        help="Path to the ready IFP source record.",
+    )
+    handoff_parser.add_argument(
+        "--tip-schema",
+        type=Path,
+        default=DEFAULT_SCHEMA_PATH,
+        help="Path to the TIP record JSON schema.",
+    )
+    handoff_parser.add_argument(
+        "--ifp-schema",
+        type=Path,
+        default=DEFAULT_IFP_SCHEMA_PATH,
+        help="Path to the IFP record JSON schema.",
+    )
+
     return parser
 
 
-def run_validation(target: Path, schema: Path, validator: Validator) -> int:
-    try:
-        results = validator(target, schema)
-    except FileNotFoundError as exc:
-        print(f"FAIL {exc}")
-        return 1
-
+def print_results(results: list[ValidationResult]) -> int:
     failed = False
     for result in results:
         if result.ok:
@@ -78,6 +100,36 @@ def run_validation(target: Path, schema: Path, validator: Validator) -> int:
     return 1 if failed else 0
 
 
+def run_validation(target: Path, schema: Path, validator: Validator) -> int:
+    try:
+        results = validator(target, schema)
+    except FileNotFoundError as exc:
+        print(f"FAIL {exc}")
+        return 1
+
+    return print_results(results)
+
+
+def run_handoff_validation(
+    tip_record: Path,
+    ifp_record: Path,
+    tip_schema: Path,
+    ifp_schema: Path,
+) -> int:
+    try:
+        result = validate_ifp_to_tip_handoff(
+            tip_record,
+            ifp_record,
+            tip_schema,
+            ifp_schema,
+        )
+    except FileNotFoundError as exc:
+        print(f"FAIL {exc}")
+        return 1
+
+    return print_results([result])
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -87,6 +139,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "validate-ifp":
         return run_validation(args.target, args.schema, validate_ifp_target)
+
+    if args.command == "validate-handoff":
+        return run_handoff_validation(
+            args.tip_record,
+            args.ifp_record,
+            args.tip_schema,
+            args.ifp_schema,
+        )
 
     parser.print_help()
     return 1
