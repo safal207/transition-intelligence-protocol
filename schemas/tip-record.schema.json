@@ -25,27 +25,6 @@
       "type": "string",
       "enum": ["draft", "clarified", "blocked", "committed", "reviewed"]
     },
-    "initialization": {
-      "type": "object",
-      "required": ["source_protocol", "source_record_id", "ready_state", "evidence"],
-      "properties": {
-        "source_protocol": {
-          "type": "string",
-          "enum": ["IFP"]
-        },
-        "source_record_id": {
-          "type": "string"
-        },
-        "ready_state": {
-          "type": "string"
-        },
-        "evidence": {
-          "type": "array",
-          "items": {"type": "string"}
-        }
-      },
-      "additionalProperties": false
-    },
     "state": {
       "type": "object",
       "required": ["summary"],
