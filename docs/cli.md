@@ -42,6 +42,38 @@ Custom schema:
 python -m tip validate-ifp examples/ifp/ --schema schemas/ifp-record.schema.json
 ```
 
+## Validate an IFP-to-TIP handoff
+
+The handoff validator checks one interface record together with the referenced IFP and TIP records:
+
+```bash
+python -m tip validate-handoff \
+  examples/handoff/project-to-next-step.handoff.json \
+  --ifp examples/ifp/project-initialization.ifp.json \
+  --tip examples/json/repository-next-step.tip.json
+```
+
+Optional schema overrides:
+
+```bash
+python -m tip validate-handoff \
+  examples/handoff/project-to-next-step.handoff.json \
+  --ifp examples/ifp/project-initialization.ifp.json \
+  --tip examples/json/repository-next-step.tip.json \
+  --handoff-schema schemas/ifp-tip-handoff.schema.json \
+  --ifp-schema schemas/ifp-record.schema.json \
+  --tip-schema schemas/tip-record.schema.json
+```
+
+The command verifies:
+
+- all three records are structurally and semantically valid;
+- the source and target record IDs match;
+- the IFP source is ready;
+- the handoff ready state matches the IFP target state;
+- the handoff target state matches the TIP state summary;
+- a verified handoff contains verification evidence.
+
 ## Run validator self-tests
 
 ```bash
@@ -52,8 +84,8 @@ python -m unittest discover -s tests -v
 
 | Code | Meaning |
 | --- | --- |
-| 0 | All checked records are valid. |
-| 1 | At least one record is invalid, missing, or no records were found. |
+| 0 | All checked records and relationships are valid. |
+| 1 | At least one record or relationship is invalid, missing, or empty. |
 
 ## Current scope
 
@@ -65,22 +97,13 @@ The CLI currently validates:
 - numeric bounds;
 - malformed JSON handling;
 - one file or one matching directory;
-- selected TIP and IFP semantic invariants.
+- selected TIP and IFP semantic invariants;
+- explicit cross-record IFP-to-TIP handoffs.
 
 Directory discovery is currently non-recursive:
 
 - TIP: `*.tip.json`
 - IFP: `*.ifp.json`
-
-## Current IFP readiness rules
-
-The IFP validator rejects:
-
-- `status = ready` when feedback did not pass;
-- `status = ready` without readiness confirmation;
-- readiness without evidence;
-- required correction without recorded changes;
-- failed feedback combined with a ready result.
 
 ## Roadmap
 
@@ -91,4 +114,4 @@ Future CLI versions should add:
 - machine-readable output;
 - better error locations;
 - package installation entry point;
-- explicit IFP-to-TIP handoff validation.
+- automatic handoff record discovery.
