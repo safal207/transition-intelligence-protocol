@@ -70,6 +70,7 @@ The command verifies:
 - all three records are structurally and semantically valid;
 - the source and target record IDs match;
 - the IFP source is ready;
+- the IFP source explicitly targets TIP as its next protocol;
 - the handoff ready state matches the IFP target state;
 - the handoff target state matches the TIP state summary;
 - a verified handoff contains verification evidence.
