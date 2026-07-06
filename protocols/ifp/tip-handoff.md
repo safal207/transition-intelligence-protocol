@@ -10,6 +10,7 @@ It is an interface contract, not a third protocol.
 IFP Record
   status = ready
   readiness.ready = true
+  readiness.next_protocol = TIP
         ↓
 IFP-to-TIP Handoff
         ↓
@@ -36,11 +37,12 @@ A verified handoff requires:
 1. the referenced IFP record is valid;
 2. the IFP record has `status = ready`;
 3. the IFP record has `readiness.ready = true`;
-4. the referenced TIP record is valid;
-5. handoff record identifiers match the referenced records;
-6. the handoff ready state matches the IFP target state;
-7. the handoff target state matches the TIP state summary;
-8. verification evidence is present.
+4. the IFP record has `readiness.next_protocol = TIP`;
+5. the referenced TIP record is valid;
+6. handoff record identifiers match the referenced records;
+7. the handoff ready state matches the IFP target state;
+8. the handoff target state matches the TIP state summary;
+9. verification evidence is present.
 
 ## Command
 
