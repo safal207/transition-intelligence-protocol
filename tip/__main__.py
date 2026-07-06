@@ -7,7 +7,10 @@ import sys
 from pathlib import Path
 from typing import Callable
 
-from tip.handoff_validator import validate_ifp_to_tip_handoff
+from tip.handoff_validator import (
+    DEFAULT_HANDOFF_SCHEMA_PATH,
+    validate_handoff_bundle,
+)
 from tip.ifp_validator import DEFAULT_IFP_SCHEMA_PATH, validate_ifp_target
 from tip.validator import DEFAULT_SCHEMA_PATH, ValidationResult, validate_target
 
@@ -57,29 +60,44 @@ def build_parser() -> argparse.ArgumentParser:
 
     handoff_parser = subparsers.add_parser(
         "validate-handoff",
-        help="Validate provenance across one ready IFP record and one TIP record.",
+        help="Validate one explicit IFP-to-TIP handoff and both referenced records.",
     )
     handoff_parser.add_argument(
-        "tip_record",
+        "handoff_record",
         type=Path,
-        help="Path to the TIP record receiving the initialized state.",
+        help="Path to the .handoff.json interface record.",
     )
     handoff_parser.add_argument(
-        "ifp_record",
+        "--ifp",
+        dest="ifp_record",
         type=Path,
+        required=True,
         help="Path to the ready IFP source record.",
     )
     handoff_parser.add_argument(
-        "--tip-schema",
+        "--tip",
+        dest="tip_record",
         type=Path,
-        default=DEFAULT_SCHEMA_PATH,
-        help="Path to the TIP record JSON schema.",
+        required=True,
+        help="Path to the TIP record receiving the ready state.",
+    )
+    handoff_parser.add_argument(
+        "--handoff-schema",
+        type=Path,
+        default=DEFAULT_HANDOFF_SCHEMA_PATH,
+        help="Path to the handoff JSON schema.",
     )
     handoff_parser.add_argument(
         "--ifp-schema",
         type=Path,
         default=DEFAULT_IFP_SCHEMA_PATH,
         help="Path to the IFP record JSON schema.",
+    )
+    handoff_parser.add_argument(
+        "--tip-schema",
+        type=Path,
+        default=DEFAULT_SCHEMA_PATH,
+        help="Path to the TIP record JSON schema.",
     )
 
     return parser
@@ -111,17 +129,21 @@ def run_validation(target: Path, schema: Path, validator: Validator) -> int:
 
 
 def run_handoff_validation(
-    tip_record: Path,
+    handoff_record: Path,
     ifp_record: Path,
-    tip_schema: Path,
+    tip_record: Path,
+    handoff_schema: Path,
     ifp_schema: Path,
+    tip_schema: Path,
 ) -> int:
     try:
-        result = validate_ifp_to_tip_handoff(
-            tip_record,
+        result = validate_handoff_bundle(
+            handoff_record,
             ifp_record,
-            tip_schema,
+            tip_record,
+            handoff_schema,
             ifp_schema,
+            tip_schema,
         )
     except FileNotFoundError as exc:
         print(f"FAIL {exc}")
@@ -142,10 +164,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "validate-handoff":
         return run_handoff_validation(
-            args.tip_record,
+            args.handoff_record,
             args.ifp_record,
-            args.tip_schema,
+            args.tip_record,
+            args.handoff_schema,
             args.ifp_schema,
+            args.tip_schema,
         )
 
     parser.print_help()
