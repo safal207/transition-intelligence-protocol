@@ -1,0 +1,70 @@
+{
+  "id": "tip.example.repository_next_step",
+  "title": "Choose the next transition after repository initialization",
+  "status": "clarified",
+  "state": {
+    "summary": "Repository has a specification, examples, validation, and automated feedback",
+    "actors": ["project maintainer", "contributors", "future users"],
+    "known_facts": [
+      "the initialization record is ready",
+      "canonical TIP and IFP examples exist",
+      "validator self-tests exist"
+    ],
+    "constraints": [
+      "the protocol interfaces are still draft",
+      "the repository should stay small and inspectable"
+    ]
+  },
+  "tension": {
+    "summary": "The foundation is ready, but the next transition must preserve a clear boundary between initialization and transition reasoning.",
+    "kind": "opportunity",
+    "severity": "medium"
+  },
+  "cause": {
+    "cause_type": "opportunity",
+    "summary": "A verified initialization state can now be used as the starting state for transition reasoning.",
+    "supporting_signals": [
+      "IFP readiness evidence exists",
+      "TIP validation is operational"
+    ],
+    "basis": "Verified IFP-to-TIP handoff",
+    "parent_cause": null,
+    "confidence": 0.9
+  },
+  "transition": {
+    "from": "initialized protocol repository",
+    "to": "protocol family with an explicit verified handoff",
+    "trigger": "availability of a ready IFP record",
+    "reversibility": "high",
+    "expected_consequence": "TIP states can preserve the source of their initialization context",
+    "uncertainty": "low"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "project maintainer",
+        "goal": "clear protocol boundaries",
+        "risk": "overcomplicated architecture"
+      },
+      {
+        "name": "contributors",
+        "goal": "inspectable records",
+        "risk": "unclear source state"
+      },
+      {
+        "name": "future users",
+        "goal": "reproducible reasoning",
+        "risk": "unverifiable assumptions"
+      }
+    ],
+    "shared_upside": "The starting state of a TIP decision remains traceable to verified initialization evidence.",
+    "defection_risk": "low",
+    "stability": "stable",
+    "recommendation": "clarify"
+  },
+  "action": {
+    "summary": "Validate one explicit IFP-to-TIP handoff before expanding the protocol family.",
+    "review_after": "handoff validator and negative tests pass",
+    "owner": "project maintainer"
+  }
+}
