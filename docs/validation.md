@@ -49,6 +49,7 @@ The suite covers:
 - IFP readiness rules;
 - handoff record ID matching;
 - IFP readiness at handoff time;
+- explicit `readiness.next_protocol = TIP` at handoff time;
 - IFP ready-state and TIP state matching;
 - handoff verification evidence.
 
