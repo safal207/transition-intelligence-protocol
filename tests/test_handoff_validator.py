@@ -66,6 +66,22 @@ class HandoffValidatorTests(unittest.TestCase):
             result.errors,
         )
 
+    def test_ifp_source_must_target_tip(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            ifp = load(IFP)
+            ifp["readiness"]["next_protocol"] = "OTHER"
+            ifp_path = root / "wrong-next-protocol.ifp.json"
+            write(ifp_path, ifp)
+
+            result = validate_handoff_bundle(HANDOFF, ifp_path, TIP)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("handoff source must target 'TIP'" in error for error in result.errors),
+            result.errors,
+        )
+
     def test_target_state_must_match_tip_state(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
