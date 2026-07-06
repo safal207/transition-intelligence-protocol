@@ -1,0 +1,29 @@
+{
+  "id": "handoff.example.project_to_next_step",
+  "title": "Pass repository initialization readiness into TIP",
+  "status": "verified",
+  "source": {
+    "protocol": "IFP",
+    "record_id": "ifp.example.project_initialization",
+    "ready_state": "Repository has a specification, examples, validation, and automated feedback"
+  },
+  "target": {
+    "protocol": "TIP",
+    "record_id": "tip.example.repository_next_step",
+    "state_summary": "Repository has a specification, examples, validation, and automated feedback"
+  },
+  "mapping": {
+    "source_ready_state": "Repository has a specification, examples, validation, and automated feedback",
+    "target_state": "Repository has a specification, examples, validation, and automated feedback",
+    "rationale": "The verified IFP target state is used unchanged as the initial TIP state."
+  },
+  "verification": {
+    "source_verified": true,
+    "mapping_verified": true,
+    "evidence": [
+      "examples/ifp/project-initialization.ifp.json",
+      "examples/json/repository-next-step.tip.json",
+      "schemas/ifp-tip-handoff.schema.json"
+    ]
+  }
+}
