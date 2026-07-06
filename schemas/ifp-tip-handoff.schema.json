@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/ifp-tip-handoff.schema.json",
+  "title": "IFP to TIP Handoff",
+  "type": "object",
+  "required": ["id", "title", "status", "source", "target", "mapping", "verification"],
+  "properties": {
+    "id": {"type": "string"},
+    "title": {"type": "string"},
+    "status": {
+      "type": "string",
+      "enum": ["draft", "verified", "rejected"]
+    },
+    "source": {
+      "type": "object",
+      "required": ["protocol", "record_id", "ready_state"],
+      "properties": {
+        "protocol": {"type": "string", "enum": ["IFP"]},
+        "record_id": {"type": "string"},
+        "ready_state": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "required": ["protocol", "record_id", "state_summary"],
+      "properties": {
+        "protocol": {"type": "string", "enum": ["TIP"]},
+        "record_id": {"type": "string"},
+        "state_summary": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "mapping": {
+      "type": "object",
+      "required": ["source_ready_state", "target_state", "rationale"],
+      "properties": {
+        "source_ready_state": {"type": "string"},
+        "target_state": {"type": "string"},
+        "rationale": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object",
+      "required": ["source_verified", "mapping_verified", "evidence"],
+      "properties": {
+        "source_verified": {"type": "boolean"},
+        "mapping_verified": {"type": "boolean"},
+        "evidence": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
