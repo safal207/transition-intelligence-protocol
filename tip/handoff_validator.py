@@ -108,6 +108,9 @@ def validate_handoff_bundle(
     if ifp["readiness"]["ready"] is not True:
         errors.append("IFP $.readiness.ready: handoff source must be ready")
 
+    if ifp["readiness"].get("next_protocol") != "TIP":
+        errors.append("IFP $.readiness.next_protocol: handoff source must target 'TIP'")
+
     if source["ready_state"] != ifp["subject"]["target_state"]:
         errors.append("$.source.ready_state: does not match the IFP target state")
 
