@@ -29,8 +29,9 @@ jobs:
       - name: Validate canonical IFP-to-TIP handoff
         run: >-
           python -m tip validate-handoff
-          examples/json/protocol-family-next-step.tip.json
-          examples/ifp/project-initialization.ifp.json
+          examples/handoff/project-to-next-step.handoff.json
+          --ifp examples/ifp/project-initialization.ifp.json
+          --tip examples/json/repository-next-step.tip.json
 
       - name: Test protocol validators
         run: python -m unittest discover -s tests -v
