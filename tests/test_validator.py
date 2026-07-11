@@ -49,8 +49,7 @@ class ValidatorTests(unittest.TestCase):
 
     def test_additional_top_level_property_fails(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
-        data["unexpected"] = true_value = True
-        self.assertTrue(true_value)
+        data["unexpected"] = True
 
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "extra-top-level.tip.json"
