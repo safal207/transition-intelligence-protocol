@@ -23,31 +23,32 @@ Goal: make the existing validators match the schemas they claim to enforce.
 
 ### 1.1 Enforce `additionalProperties: false`
 
-Status: Next
+Status: Done
 
 Cause:
 
 - Schemas declare strict objects.
-- The current dependency-free schema subset does not yet reject unknown object fields.
-- This can create a false pass.
+- The dependency-free schema subset must reject unknown object fields.
+- Otherwise strict schemas can create a false pass.
 
-Tasks:
+Completed:
 
 - reject unknown fields when `additionalProperties` is `false`;
 - add negative tests for unknown top-level fields;
 - add negative tests for unknown nested fields;
-- ensure TIP, IFP, and handoff examples remain valid.
+- cover TIP, IFP, and handoff validation paths;
+- document the supported schema subset.
 
 Definition of Done:
 
 - invalid records with unknown fields fail;
 - failure path points to the unexpected field;
-- validator self-tests pass;
+- validator self-tests cover TIP, IFP, and handoff additional-property failures;
 - CI runs the updated tests.
 
 ### 1.2 Add more semantic invariants
 
-Status: Planned
+Status: Next
 
 Tasks:
 
