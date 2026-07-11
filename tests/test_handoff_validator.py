@@ -7,7 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tip.handoff_validator import validate_handoff_bundle
+from tip.handoff_validator import DEFAULT_HANDOFF_SCHEMA_PATH, validate_handoff_bundle, validate_handoff_file
+from tip.validator import load_json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +26,10 @@ def write(path: Path, data: dict) -> None:
 
 
 class HandoffValidatorTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.handoff_schema = load_json(DEFAULT_HANDOFF_SCHEMA_PATH)
+
     def test_valid_handoff_bundle_passes(self) -> None:
         result = validate_handoff_bundle(HANDOFF, IFP, TIP)
         self.assertTrue(result.ok, result.errors)
@@ -113,6 +118,36 @@ class HandoffValidatorTests(unittest.TestCase):
         self.assertFalse(result.ok)
         self.assertTrue(
             any("verified handoff requires evidence" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_additional_handoff_top_level_property_fails(self) -> None:
+        handoff = load(HANDOFF)
+        handoff["unexpected"] = True
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "extra-top-level.handoff.json"
+            write(path, handoff)
+            result = validate_handoff_file(path, self.handoff_schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("$.unexpected: unexpected additional property" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_additional_handoff_nested_property_fails(self) -> None:
+        handoff = load(HANDOFF)
+        handoff["source"]["extra_source_field"] = "not allowed"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "extra-nested.handoff.json"
+            write(path, handoff)
+            result = validate_handoff_file(path, self.handoff_schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("$.source.extra_source_field: unexpected additional property" in error for error in result.errors),
             result.errors,
         )
 
