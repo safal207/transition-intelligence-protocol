@@ -41,6 +41,7 @@ The suite covers:
 
 - valid TIP, IFP, and handoff examples;
 - required fields and nested fields;
+- rejection of unknown fields when `additionalProperties` is `false`;
 - JSON value types and enum values;
 - numeric bounds;
 - malformed JSON handling;
@@ -72,6 +73,17 @@ python -m unittest discover -s tests -v
 ## Known limits
 
 The validators implement a focused subset of JSON Schema.
+
+Supported subset:
+
+- `type`;
+- `enum`;
+- `required`;
+- `properties`;
+- `items`;
+- `minimum`;
+- `maximum`;
+- `additionalProperties: false`.
 
 ## Future work
 
