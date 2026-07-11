@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -45,6 +46,37 @@ class ValidatorTests(unittest.TestCase):
                     any(expected_error in error for error in result.errors),
                     f"Expected {expected_error!r}, got {result.errors!r}",
                 )
+
+    def test_additional_top_level_property_fails(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["unexpected"] = true_value = True
+        self.assertTrue(true_value)
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "extra-top-level.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("$.unexpected: unexpected additional property" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_additional_nested_property_fails(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["state"]["extra_state_field"] = "not allowed"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "extra-nested.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("$.state.extra_state_field: unexpected additional property" in error for error in result.errors),
+            result.errors,
+        )
 
     def test_malformed_json_fails_without_crashing(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
