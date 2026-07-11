@@ -83,6 +83,11 @@ def validate_schema_subset(
                 errors.append(f"{path}: missing required field '{key}'")
 
         properties = schema.get("properties", {})
+        if schema.get("additionalProperties") is False:
+            for key in data:
+                if key not in properties:
+                    errors.append(f"{path}.{key}: unexpected additional property")
+
         for key, value in data.items():
             child_schema = properties.get(key)
             if isinstance(child_schema, dict):
