@@ -47,6 +47,25 @@ class ValidatorTests(unittest.TestCase):
                     f"Expected {expected_error!r}, got {result.errors!r}",
                 )
 
+    def test_committed_record_requires_concrete_action_summary(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["action"]["summary"] = "   "
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "committed-without-action.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "committed records require a concrete action summary" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
     def test_additional_top_level_property_fails(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["unexpected"] = True
