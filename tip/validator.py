@@ -108,6 +108,16 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     status = data.get("status")
     cooperation = data.get("cooperation")
+    action = data.get("action")
+
+    if isinstance(action, dict):
+        action_summary = action.get("summary")
+        if status == "committed" and (
+            not isinstance(action_summary, str) or not action_summary.strip()
+        ):
+            errors.append(
+                "$.action.summary: committed records require a concrete action summary"
+            )
 
     if not isinstance(cooperation, dict):
         return errors
