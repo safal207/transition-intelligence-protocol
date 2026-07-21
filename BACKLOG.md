@@ -48,13 +48,18 @@ Definition of Done:
 
 ### 1.2 Add more semantic invariants
 
-Status: Next
+Status: In progress
 
-Tasks:
+Completed:
 
-- committed TIP records require a concrete action summary;
+- committed TIP records require a non-empty concrete action summary;
+- negative test proves a whitespace-only committed action is rejected;
+- TIP specification documents the commitment rule.
+
+Remaining tasks:
+
 - reviewed TIP records require outcome or review notes;
-- low cause confidence must not directly produce commitment;
+- define a justified policy for low cause confidence before blocking commitment;
 - handoff evidence should reference existing files where possible.
 
 Definition of Done:
@@ -91,6 +96,7 @@ Tasks:
 - keep IFP focused on readiness only;
 - keep TIP focused on transitions only;
 - keep handoff as an interface contract, not a protocol;
+- document that IFP is optional when the starting state is already known and sufficient;
 - remove duplicate handoff descriptions when they drift.
 
 Definition of Done:
@@ -190,6 +196,20 @@ Tasks:
 - verify workflow success on `main`;
 - create tag or release marker;
 - link release marker from README or roadmap.
+
+## Discovery — Human memory representation
+
+Status: Research only
+
+Goal: test whether personal, confirmed metaphors improve understanding and later recall before building storage infrastructure.
+
+Tasks:
+
+- define a minimal Memory Card candidate format;
+- keep concept, metaphor, retrieval cues, source, and status separate;
+- distinguish textual metaphor from an optional rendered image;
+- test one learning use case with delayed recall;
+- do not make memory cards a new protocol until the user value is demonstrated.
 
 ## Not now
 
