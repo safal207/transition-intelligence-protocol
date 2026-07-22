@@ -51,6 +51,21 @@ TIP answers: **What transition is justified next?**
 
 The handoff answers: **Did this exact ready state become this exact TIP state?**
 
+### Kairos research integration
+
+The optional Kairos profile exports a justified TIP transition proposal for research-only phase-window assessment:
+
+```text
+IFP Ready State
+-> TIP justified transition
+-> versioned TIP export
+-> Kairos phase-window assessment
+```
+
+This is a bounded interoperability profile, not a third protocol and not a merger of TIP with Kairos. Neither side gains execution, clinical, approval, ownership, delivery, or merge authority.
+
+Profile: [`integrations/kairos/v0.1.md`](integrations/kairos/v0.1.md)
+
 ## Why this exists
 
 Many decision systems answer only one question:
@@ -91,7 +106,13 @@ python -m tip validate-handoff \
   --tip examples/json/repository-next-step.tip.json
 ```
 
-Run validator self-tests:
+Validate the TIP-to-Kairos export profile through its regression suite:
+
+```bash
+python -m unittest tests.test_kairos_profile -v
+```
+
+Run all validator self-tests:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -149,6 +170,10 @@ transition-intelligence-protocol/
     ifp/
       spec.md
       tip-handoff.md
+  integrations/
+    kairos/
+      v0.1.md
+      profile.v0.1.json
   schemas/
     tip-record.schema.json
     ifp-record.schema.json
@@ -163,15 +188,19 @@ transition-intelligence-protocol/
       project-initialization.ifp.json
     handoff/
       project-to-next-step.handoff.json
+    integrations/
+      kairos-export.tip.json
   tip/
     __main__.py
     validator.py
     ifp_validator.py
     handoff_validator.py
+    kairos_profile.py
   tests/
     test_validator.py
     test_ifp_validator.py
     test_handoff_validator.py
+    test_kairos_profile.py
   docs/
     cli.md
     validation.md
@@ -199,6 +228,7 @@ Current focus:
 - keep TIP and IFP records small and inspectable;
 - require negative tests for semantic rules;
 - preserve explicit provenance from IFP readiness into TIP state reasoning;
+- keep external integrations as small, versioned profiles rather than protocol mergers;
 - avoid splitting protocols into separate repositories before their interfaces stabilize.
 
 ## License

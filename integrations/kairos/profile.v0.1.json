@@ -1,0 +1,32 @@
+{
+  "schema": "tip.kairos.export-profile.v0.1",
+  "required": [
+    "protocol",
+    "protocol_version",
+    "repository",
+    "commit_ref",
+    "starting_state_ref",
+    "tension",
+    "cause",
+    "proposed_transition",
+    "smallest_research_step",
+    "evidence_refs",
+    "provenance"
+  ],
+  "constants": {
+    "protocol": "Transition Intelligence Protocol",
+    "repository": "https://github.com/safal207/transition-intelligence-protocol"
+  },
+  "provenance_required": ["producer", "produced_at", "data_digest"],
+  "handoff_authority": {
+    "classification": "RESEARCH_ONLY",
+    "execution_authorized": false,
+    "clinical_authorized": false,
+    "merge_authorized": false
+  },
+  "target": {
+    "repository": "https://github.com/safal207/Kairos-Gate-for-X-Cell",
+    "handoff_schema": "tip.kairos.handoff.v0.1",
+    "tip_export_additional_properties": false
+  }
+}
