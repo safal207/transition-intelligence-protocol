@@ -1,0 +1,30 @@
+{
+  "schema": "tip.kairos.export-negative-fixtures.v0.1",
+  "canonical_ref": "examples/integrations/kairos-export.tip.json",
+  "cases": [
+    {
+      "id": "missing-starting-state",
+      "operation": "remove",
+      "path": ["starting_state_ref"],
+      "expected_error": "missing required field 'starting_state_ref'"
+    },
+    {
+      "id": "missing-cause",
+      "operation": "remove",
+      "path": ["cause"],
+      "expected_error": "missing required field 'cause'"
+    },
+    {
+      "id": "missing-evidence",
+      "operation": "remove",
+      "path": ["evidence_refs"],
+      "expected_error": "missing required field 'evidence_refs'"
+    },
+    {
+      "id": "missing-provenance",
+      "operation": "remove",
+      "path": ["provenance"],
+      "expected_error": "missing required field 'provenance'"
+    }
+  ]
+}
