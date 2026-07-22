@@ -17,6 +17,7 @@ COMMIT_RE = re.compile(
 )
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 TIP_REPOSITORY = "https://github.com/safal207/transition-intelligence-protocol"
+TIP_PROTOCOL = "Transition Intelligence Protocol"
 
 
 def _reject_constant(value: str) -> None:
@@ -44,17 +45,24 @@ def _valid_timestamp(value: Any) -> bool:
 def validate_kairos_export_data(
     data: Any, profile: dict[str, Any]
 ) -> list[str]:
-    """Validate required export fields, provenance, exact commit, and authority."""
+    """Validate a receiver-compatible TIP export and its immutable provenance."""
     if not isinstance(data, dict):
         return ["$: export root must be an object"]
 
     errors: list[str] = []
-    for field in profile.get("required", []):
+    required = profile.get("required", [])
+    allowed = set(required) if isinstance(required, list) else set()
+
+    for field in required:
         if field not in data:
             errors.append(f"$: missing required field '{field}'")
 
+    for field in data:
+        if field not in allowed:
+            errors.append(f"$.{field}: unexpected receiver-incompatible field")
+
     string_fields = [
-        "schema",
+        "protocol",
         "protocol_version",
         "repository",
         "commit_ref",
@@ -69,9 +77,10 @@ def validate_kairos_export_data(
         if not isinstance(value, str) or not value.strip():
             errors.append(f"$.{field}: must be a non-empty string")
 
-    if data.get("schema") != "tip.kairos.export.v0.1":
-        errors.append("$.schema: unsupported export schema")
-    if data.get("repository") != TIP_REPOSITORY:
+    constants = profile.get("constants", {})
+    if data.get("protocol") != constants.get("protocol", TIP_PROTOCOL):
+        errors.append("$.protocol: must identify Transition Intelligence Protocol")
+    if data.get("repository") != constants.get("repository", TIP_REPOSITORY):
         errors.append("$.repository: must identify the TIP repository")
     if not isinstance(data.get("commit_ref"), str) or not COMMIT_RE.fullmatch(
         data["commit_ref"]
@@ -101,10 +110,6 @@ def validate_kairos_export_data(
             provenance["data_digest"]
         ):
             errors.append("$.provenance.data_digest: must be a sha256 digest")
-
-    expected_authority = profile.get("authority")
-    if data.get("authority") != expected_authority:
-        errors.append("$.authority: must match the research-only no-execution boundary")
 
     return errors
 
