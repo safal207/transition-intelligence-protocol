@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from tip.validator import ValidationResult
 
@@ -40,6 +41,17 @@ def _valid_timestamp(value: Any) -> bool:
     except ValueError:
         return False
     return parsed.tzinfo is not None
+
+
+def _valid_https_uri(value: Any) -> bool:
+    """Return whether value is an absolute HTTPS URI with a host."""
+    if not isinstance(value, str) or not value.strip():
+        return False
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return False
+    return parsed.scheme == "https" and bool(parsed.netloc)
 
 
 def validate_kairos_export_data(
@@ -90,16 +102,30 @@ def validate_kairos_export_data(
     evidence = data.get("evidence_refs")
     if not isinstance(evidence, list) or not evidence:
         errors.append("$.evidence_refs: must contain at least one reference")
-    elif any(not isinstance(item, str) or not item.startswith("https://") for item in evidence):
-        errors.append("$.evidence_refs: every reference must be a non-empty HTTPS URL")
+    else:
+        if any(not _valid_https_uri(item) for item in evidence):
+            errors.append("$.evidence_refs: every reference must be an absolute HTTPS URI")
+        if len(set(evidence)) != len(evidence):
+            errors.append("$.evidence_refs: references must be unique")
 
     provenance = data.get("provenance")
     if not isinstance(provenance, dict):
         errors.append("$.provenance: must be an object")
     else:
-        for field in profile.get("provenance_required", []):
+        provenance_required = profile.get("provenance_required", [])
+        provenance_allowed = (
+            set(provenance_required)
+            if isinstance(provenance_required, list)
+            else set()
+        )
+        for field in provenance_required:
             if field not in provenance:
                 errors.append(f"$.provenance: missing required field '{field}'")
+        for field in provenance:
+            if field not in provenance_allowed:
+                errors.append(
+                    f"$.provenance.{field}: unexpected receiver-incompatible field"
+                )
         if not isinstance(provenance.get("producer"), str) or not provenance.get(
             "producer", ""
         ).strip():
