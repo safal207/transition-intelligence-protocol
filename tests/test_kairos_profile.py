@@ -29,6 +29,12 @@ class KairosExportProfileTests(unittest.TestCase):
         result = validate_kairos_export_file(EXAMPLE)
         self.assertTrue(result.ok, result.errors)
 
+    def test_export_keys_match_receiver_contract(self) -> None:
+        self.assertEqual(set(self.base), set(self.profile["required"]))
+        self.assertIn("protocol", self.base)
+        self.assertNotIn("schema", self.base)
+        self.assertNotIn("authority", self.base)
+
     def test_negative_fixtures_fail_closed(self) -> None:
         self.assertGreaterEqual(len(self.fixtures["cases"]), 3)
         for case in self.fixtures["cases"]:
@@ -41,14 +47,18 @@ class KairosExportProfileTests(unittest.TestCase):
                     errors,
                 )
 
-    def test_export_cannot_authorize_execution(self) -> None:
+    def test_receiver_incompatible_extra_field_is_rejected(self) -> None:
         record = copy.deepcopy(self.base)
-        record["authority"]["execution_authorized"] = True
+        record["schema"] = "tip.kairos.export.v0.1"
         errors = validate_kairos_export_data(record, self.profile)
-        self.assertIn(
-            "$.authority: must match the research-only no-execution boundary",
-            errors,
-        )
+        self.assertIn("$.schema: unexpected receiver-incompatible field", errors)
+
+    def test_profile_preserves_no_execution_boundary(self) -> None:
+        authority = self.profile["handoff_authority"]
+        self.assertEqual(authority["classification"], "RESEARCH_ONLY")
+        self.assertFalse(authority["execution_authorized"])
+        self.assertFalse(authority["clinical_authorized"])
+        self.assertFalse(authority["merge_authorized"])
 
     def test_commit_ref_must_be_exact(self) -> None:
         record = copy.deepcopy(self.base)
