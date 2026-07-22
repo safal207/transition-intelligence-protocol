@@ -53,6 +53,29 @@ class KairosExportProfileTests(unittest.TestCase):
         errors = validate_kairos_export_data(record, self.profile)
         self.assertIn("$.schema: unexpected receiver-incompatible field", errors)
 
+    def test_evidence_refs_must_be_unique_absolute_https_uris(self) -> None:
+        duplicate = copy.deepcopy(self.base)
+        duplicate["evidence_refs"].append(duplicate["evidence_refs"][0])
+        duplicate_errors = validate_kairos_export_data(duplicate, self.profile)
+        self.assertIn("$.evidence_refs: references must be unique", duplicate_errors)
+
+        malformed = copy.deepcopy(self.base)
+        malformed["evidence_refs"] = ["https://"]
+        malformed_errors = validate_kairos_export_data(malformed, self.profile)
+        self.assertIn(
+            "$.evidence_refs: every reference must be an absolute HTTPS URI",
+            malformed_errors,
+        )
+
+    def test_provenance_rejects_receiver_incompatible_extra_fields(self) -> None:
+        record = copy.deepcopy(self.base)
+        record["provenance"]["source_url"] = "https://example.com/source"
+        errors = validate_kairos_export_data(record, self.profile)
+        self.assertIn(
+            "$.provenance.source_url: unexpected receiver-incompatible field",
+            errors,
+        )
+
     def test_profile_preserves_no_execution_boundary(self) -> None:
         authority = self.profile["handoff_authority"]
         self.assertEqual(authority["classification"], "RESEARCH_ONLY")
