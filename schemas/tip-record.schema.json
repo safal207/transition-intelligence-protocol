@@ -145,6 +145,20 @@
         "owner": { "type": "string" }
       },
       "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "actual_consequence": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "next_state": { "type": "string" }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false
