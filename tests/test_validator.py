@@ -66,6 +66,41 @@ class ValidatorTests(unittest.TestCase):
             result.errors,
         )
 
+    def test_reviewed_record_requires_concrete_review_notes(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "reviewed"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "reviewed-without-review.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "reviewed records require concrete review notes" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_reviewed_record_with_review_notes_passes(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "reviewed"
+        data["review"] = {
+            "summary": "The clarification step produced an actionable request.",
+            "actual_consequence": "The owner and next action are now explicit.",
+            "evidence": ["clarified request record"],
+            "next_state": "ready for a bounded action",
+        }
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "reviewed-with-review.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertTrue(result.ok, result.errors)
+
     def test_additional_top_level_property_fails(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["unexpected"] = True
