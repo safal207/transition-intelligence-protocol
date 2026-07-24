@@ -1,0 +1,60 @@
+{
+  "id": "tip.example.pilot_review",
+  "title": "Review a bounded product pilot",
+  "status": "reviewed",
+  "state": {
+    "summary": "A small pilot was completed before a full product change.",
+    "actors": ["product owner", "pilot users"],
+    "known_facts": ["five users completed the pilot", "three users returned for a second session"],
+    "constraints": ["small sample", "one-week observation window"]
+  },
+  "tension": {
+    "summary": "The team needs to decide whether the pilot produced enough evidence for another iteration.",
+    "kind": "ambiguity",
+    "severity": "medium"
+  },
+  "cause": {
+    "cause_type": "constraint",
+    "summary": "The pilot provides directional evidence but not enough data for a full rollout.",
+    "supporting_signals": ["three repeat users", "two users did not return", "small sample size"],
+    "basis": "Observed pilot activity",
+    "confidence": 0.74
+  },
+  "transition": {
+    "from": "unreviewed pilot result",
+    "to": "bounded second iteration",
+    "trigger": "pilot review",
+    "reversibility": "high",
+    "expected_consequence": "A larger evidence set without committing to a full rollout.",
+    "uncertainty": "medium"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "product owner",
+        "goal": "learn before scaling",
+        "risk": "overinterpreting a small sample"
+      },
+      {
+        "name": "pilot users",
+        "goal": "receive a useful product",
+        "risk": "repeated changes without benefit"
+      }
+    ],
+    "shared_upside": "A safer next iteration based on observed behavior.",
+    "defection_risk": "low",
+    "stability": "stable",
+    "recommendation": "commit"
+  },
+  "action": {
+    "summary": "Run a second bounded pilot with ten users.",
+    "review_after": "second pilot completion",
+    "owner": "product owner"
+  },
+  "review": {
+    "summary": "The first pilot showed partial repeat use and justified another bounded test, not a full rollout.",
+    "actual_consequence": "The team replaced a broad launch decision with a smaller evidence-gathering step.",
+    "evidence": ["five completions", "three repeat sessions", "two non-returning users"],
+    "next_state": "second pilot approved with a larger sample"
+  }
+}
