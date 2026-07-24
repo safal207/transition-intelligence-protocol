@@ -54,11 +54,14 @@ Completed:
 
 - committed TIP records require a non-empty concrete action summary;
 - negative test proves a whitespace-only committed action is rejected;
-- TIP specification documents the commitment rule.
+- TIP specification documents the commitment rule;
+- reviewed TIP records require non-empty review notes;
+- the schema supports a bounded `review` object with summary, actual consequence, evidence, and next state;
+- positive and negative tests cover reviewed records;
+- a canonical reviewed pilot example closes the action-to-review loop.
 
 Remaining tasks:
 
-- reviewed TIP records require outcome or review notes;
 - define a justified policy for low cause confidence before blocking commitment;
 - handoff evidence should reference existing files where possible.
 
