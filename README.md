@@ -2,10 +2,16 @@
 
 [![Validate protocol family](https://github.com/safal207/transition-intelligence-protocol/actions/workflows/validate.yml/badge.svg)](https://github.com/safal207/transition-intelligence-protocol/actions/workflows/validate.yml)
 
-**Transition Intelligence Protocol** is a framework for reasoning about state, tension, cause, transition, cooperation, and action.
+**Transition Intelligence Protocol** is a framework for reasoning about state, tension, cause, transition, cooperation, action, and the observed result of a reviewed action.
 
 ```text
 State -> Tension -> Cause -> Transition -> Cooperation -> Action
+```
+
+Reviewed records may close the loop:
+
+```text
+Action -> Review -> Next State
 ```
 
 ## Protocol family
@@ -24,10 +30,10 @@ Specification: [`protocols/ifp/spec.md`](protocols/ifp/spec.md)
 
 ### Transition Intelligence Protocol (TIP)
 
-TIP reasons about the next transition from a known state:
+TIP reasons about the next transition from a known state and may later record the observed result:
 
 ```text
-State -> Tension -> Cause -> Transition -> Cooperation -> Action
+State -> Tension -> Cause -> Transition -> Cooperation -> Action -> Review
 ```
 
 Specification: [`spec/v0.1.md`](spec/v0.1.md)
@@ -47,7 +53,7 @@ Handoff contract: [`protocols/ifp/tip-handoff.md`](protocols/ifp/tip-handoff.md)
 
 IFP answers: **Is the system ready to begin?**
 
-TIP answers: **What transition is justified next?**
+TIP answers: **What transition is justified next, and what happened when it was reviewed?**
 
 The handoff answers: **Did this exact ready state become this exact TIP state?**
 
@@ -65,6 +71,7 @@ Transition Intelligence asks:
 4. What transition is likely to happen?
 5. Will the transition preserve cooperation?
 6. What action is justified now?
+7. What was actually observed after the action?
 
 This makes the protocol useful for human-AI cooperation, agent safety, strategic decisions, startup pivots, conflict analysis, and systems where a wrong transition can create long-term damage.
 
@@ -135,6 +142,9 @@ Cooperation
 
 Action
   -> the smallest justified next step
+
+Review
+  -> the observed result, evidence, and next state after action
 ```
 
 ## Repository structure
@@ -143,6 +153,7 @@ Action
 transition-intelligence-protocol/
   README.md
   ROADMAP.md
+  BACKLOG.md
   spec/
     v0.1.md
   protocols/
@@ -159,6 +170,7 @@ transition-intelligence-protocol/
       human-ai-agent.tip.json
       family-conflict.tip.json
       repository-next-step.tip.json
+      pilot-review.tip.json
     ifp/
       project-initialization.ifp.json
     handoff/
@@ -199,6 +211,7 @@ Current focus:
 - keep TIP and IFP records small and inspectable;
 - require negative tests for semantic rules;
 - preserve explicit provenance from IFP readiness into TIP state reasoning;
+- close the action-to-review loop without claiming more causality than the evidence supports;
 - avoid splitting protocols into separate repositories before their interfaces stabilize.
 
 ## License
