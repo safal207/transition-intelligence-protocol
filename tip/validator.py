@@ -109,6 +109,7 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
     status = data.get("status")
     cooperation = data.get("cooperation")
     action = data.get("action")
+    review = data.get("review")
 
     if isinstance(action, dict):
         action_summary = action.get("summary")
@@ -117,6 +118,13 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
         ):
             errors.append(
                 "$.action.summary: committed records require a concrete action summary"
+            )
+
+    if status == "reviewed":
+        review_summary = review.get("summary") if isinstance(review, dict) else None
+        if not isinstance(review_summary, str) or not review_summary.strip():
+            errors.append(
+                "$.review.summary: reviewed records require concrete review notes"
             )
 
     if not isinstance(cooperation, dict):
