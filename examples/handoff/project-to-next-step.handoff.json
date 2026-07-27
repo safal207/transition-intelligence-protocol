@@ -21,9 +21,9 @@
     "source_verified": true,
     "mapping_verified": true,
     "evidence": [
-      "examples/ifp/project-initialization.ifp.json",
-      "examples/json/repository-next-step.tip.json",
-      "schemas/ifp-tip-handoff.schema.json"
+      "file:examples/ifp/project-initialization.ifp.json",
+      "file:examples/json/repository-next-step.tip.json",
+      "file:schemas/ifp-tip-handoff.schema.json"
     ]
   }
 }
