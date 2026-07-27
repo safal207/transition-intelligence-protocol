@@ -7,7 +7,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tip.handoff_validator import DEFAULT_HANDOFF_SCHEMA_PATH, validate_handoff_bundle, validate_handoff_file
+from tip.handoff_validator import (
+    DEFAULT_HANDOFF_SCHEMA_PATH,
+    validate_handoff_bundle,
+    validate_handoff_file,
+)
 from tip.validator import load_json
 
 
@@ -118,6 +122,114 @@ class HandoffValidatorTests(unittest.TestCase):
         self.assertFalse(result.ok)
         self.assertTrue(
             any("verified handoff requires evidence" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_missing_evidence_file_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            handoff = load(HANDOFF)
+            handoff["verification"]["evidence"][0] = (
+                "file:examples/ifp/missing-source.ifp.json"
+            )
+            handoff_path = root / "missing-file.handoff.json"
+            write(handoff_path, handoff)
+
+            result = validate_handoff_bundle(handoff_path, IFP, TIP)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("referenced file does not exist" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_malformed_json_evidence_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            ifp_path = root / "source.ifp.json"
+            tip_path = root / "target.tip.json"
+            broken_path = root / "broken.json"
+            handoff_path = root / "broken-evidence.handoff.json"
+
+            write(ifp_path, load(IFP))
+            write(tip_path, load(TIP))
+            broken_path.write_text('{"broken": ', encoding="utf-8")
+
+            handoff = load(HANDOFF)
+            handoff["verification"]["evidence"] = [
+                "file:source.ifp.json",
+                "file:target.tip.json",
+                "file:broken.json",
+            ]
+            write(handoff_path, handoff)
+
+            result = validate_handoff_bundle(
+                handoff_path,
+                ifp_path,
+                tip_path,
+                repository_root=root,
+            )
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("referenced JSON file is invalid" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_evidence_file_cannot_escape_repository_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outer = Path(directory)
+            root = outer / "repository"
+            root.mkdir()
+            ifp_path = root / "source.ifp.json"
+            tip_path = root / "target.tip.json"
+            handoff_path = root / "escaping-evidence.handoff.json"
+            outside_path = outer / "outside.json"
+
+            write(ifp_path, load(IFP))
+            write(tip_path, load(TIP))
+            outside_path.write_text("{}", encoding="utf-8")
+
+            handoff = load(HANDOFF)
+            handoff["verification"]["evidence"] = [
+                "file:source.ifp.json",
+                "file:target.tip.json",
+                "file:../outside.json",
+            ]
+            write(handoff_path, handoff)
+
+            result = validate_handoff_bundle(
+                handoff_path,
+                ifp_path,
+                tip_path,
+                repository_root=root,
+            )
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("must stay inside the repository root" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_verified_bundle_requires_source_and_target_file_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            handoff = load(HANDOFF)
+            handoff["verification"]["evidence"] = [
+                "file:schemas/ifp-tip-handoff.schema.json"
+            ]
+            handoff_path = root / "missing-record-evidence.handoff.json"
+            write(handoff_path, handoff)
+
+            result = validate_handoff_bundle(handoff_path, IFP, TIP)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("must reference the IFP source file" in error for error in result.errors),
+            result.errors,
+        )
+        self.assertTrue(
+            any("must reference the TIP target file" in error for error in result.errors),
             result.errors,
         )
 
