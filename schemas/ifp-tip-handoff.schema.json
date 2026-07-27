@@ -49,7 +49,10 @@
         "mapping_verified": {"type": "boolean"},
         "evidence": {
           "type": "array",
-          "items": {"type": "string"}
+          "items": {
+            "type": "string",
+            "description": "Use file:<repository-relative path> for evidence that must resolve to a repository file."
+          }
         }
       },
       "additionalProperties": false
