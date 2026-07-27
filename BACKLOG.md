@@ -58,12 +58,15 @@ Completed:
 - reviewed TIP records require non-empty review notes;
 - the schema supports a bounded `review` object with summary, actual consequence, evidence, and next state;
 - positive and negative tests cover reviewed records;
-- a canonical reviewed pilot example closes the action-to-review loop.
+- a canonical reviewed pilot example closes the action-to-review loop;
+- handoff file evidence uses explicit repository-relative `file:` references;
+- missing files, malformed JSON, directories, absolute paths, and repository-root escapes are rejected;
+- verified file-based bundles must reference the exact IFP source and TIP target files;
+- evidence validation has positive and negative tests and is documented.
 
-Remaining tasks:
+Remaining task:
 
-- define a justified policy for low cause confidence before blocking commitment;
-- handoff evidence should reference existing files where possible.
+- define a justified policy for low cause confidence before blocking commitment.
 
 Definition of Done:
 
