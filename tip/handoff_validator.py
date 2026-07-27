@@ -18,6 +18,7 @@ from tip.validator import (
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_HANDOFF_SCHEMA_PATH = ROOT / "schemas" / "ifp-tip-handoff.schema.json"
+FILE_EVIDENCE_PREFIX = "file:"
 
 
 def validate_handoff_invariants(data: dict[str, Any]) -> list[str]:
@@ -51,6 +52,83 @@ def validate_handoff_invariants(data: dict[str, Any]) -> list[str]:
     return errors
 
 
+def _resolve_evidence_file(
+    reference: str,
+    repository_root: Path,
+) -> tuple[Path | None, str | None]:
+    """Resolve and validate one repository-relative ``file:`` evidence reference."""
+
+    raw_path = reference[len(FILE_EVIDENCE_PREFIX) :].strip()
+    if not raw_path:
+        return None, "file reference path must not be empty"
+
+    relative_path = Path(raw_path)
+    if relative_path.is_absolute():
+        return None, "file reference must be repository-relative"
+
+    root = repository_root.resolve()
+    resolved = (root / relative_path).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        return None, "file reference must stay inside the repository root"
+
+    if not resolved.exists():
+        return None, "referenced file does not exist"
+    if not resolved.is_file():
+        return None, "referenced path is not a file"
+
+    if resolved.suffix.lower() == ".json":
+        try:
+            load_json(resolved)
+        except (OSError, json.JSONDecodeError) as exc:
+            return None, f"referenced JSON file is invalid: {exc}"
+
+    return resolved, None
+
+
+def validate_handoff_evidence(
+    handoff: dict[str, Any],
+    ifp_path: Path,
+    tip_path: Path,
+    repository_root: Path = ROOT,
+) -> list[str]:
+    """Validate repository file evidence for one file-based handoff bundle."""
+
+    errors: list[str] = []
+    verification = handoff.get("verification")
+    if not isinstance(verification, dict):
+        return errors
+
+    evidence = verification.get("evidence")
+    if not isinstance(evidence, list):
+        return errors
+
+    resolved_files: list[Path] = []
+    for index, item in enumerate(evidence):
+        if not isinstance(item, str) or not item.startswith(FILE_EVIDENCE_PREFIX):
+            continue
+
+        resolved, error = _resolve_evidence_file(item, repository_root)
+        if error is not None:
+            errors.append(f"$.verification.evidence[{index}]: {error}")
+            continue
+        if resolved is not None:
+            resolved_files.append(resolved)
+
+    if handoff.get("status") == "verified":
+        if ifp_path.resolve() not in resolved_files:
+            errors.append(
+                "$.verification.evidence: verified bundle must reference the IFP source file"
+            )
+        if tip_path.resolve() not in resolved_files:
+            errors.append(
+                "$.verification.evidence: verified bundle must reference the TIP target file"
+            )
+
+    return errors
+
+
 def validate_handoff_file(path: Path, schema: dict[str, Any]) -> ValidationResult:
     try:
         data = load_json(path)
@@ -70,6 +148,7 @@ def validate_handoff_bundle(
     handoff_schema_path: Path = DEFAULT_HANDOFF_SCHEMA_PATH,
     ifp_schema_path: Path = DEFAULT_IFP_SCHEMA_PATH,
     tip_schema_path: Path = DEFAULT_SCHEMA_PATH,
+    repository_root: Path = ROOT,
 ) -> ValidationResult:
     """Validate the handoff record and both referenced protocol records together."""
 
@@ -92,35 +171,28 @@ def validate_handoff_bundle(
     ifp = load_json(ifp_path)
     tip = load_json(tip_path)
 
+    errors.extend(validate_handoff_evidence(handoff, ifp_path, tip_path, repository_root))
+
     source = handoff["source"]
     target = handoff["target"]
     mapping = handoff["mapping"]
 
     if source["record_id"] != ifp["id"]:
         errors.append("$.source.record_id: does not match the referenced IFP record id")
-
     if target["record_id"] != tip["id"]:
         errors.append("$.target.record_id: does not match the referenced TIP record id")
-
     if ifp["status"] != "ready":
         errors.append("IFP $.status: handoff source must have status 'ready'")
-
     if ifp["readiness"]["ready"] is not True:
         errors.append("IFP $.readiness.ready: handoff source must be ready")
-
     if ifp["readiness"].get("next_protocol") != "TIP":
         errors.append("IFP $.readiness.next_protocol: handoff source must target 'TIP'")
-
     if source["ready_state"] != ifp["subject"]["target_state"]:
         errors.append("$.source.ready_state: does not match the IFP target state")
-
     if target["state_summary"] != tip["state"]["summary"]:
         errors.append("$.target.state_summary: does not match the TIP state summary")
-
     if mapping["source_ready_state"] != ifp["subject"]["target_state"]:
         errors.append("$.mapping.source_ready_state: does not match the IFP target state")
-
     if mapping["target_state"] != tip["state"]["summary"]:
         errors.append("$.mapping.target_state: does not match the TIP state summary")
-
     return ValidationResult(handoff_path, errors)
