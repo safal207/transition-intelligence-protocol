@@ -42,7 +42,24 @@ A verified handoff requires:
 6. handoff record identifiers match the referenced records;
 7. the handoff ready state matches the IFP target state;
 8. the handoff target state matches the TIP state summary;
-9. verification evidence is present.
+9. verification evidence is present;
+10. repository file evidence exists, stays inside the repository root, and is readable;
+11. JSON evidence files contain valid JSON;
+12. a verified file-based bundle references the exact IFP source file and TIP target file.
+
+## File evidence
+
+Repository files use an explicit evidence prefix:
+
+```text
+file:examples/ifp/project-initialization.ifp.json
+```
+
+The part after `file:` is resolved relative to the repository root. Absolute paths and paths that escape the repository root are rejected.
+
+A file reference proves only that the named artifact exists and can be read. The bundle validator separately checks the IFP source against the IFP schema and semantic rules, checks the TIP target against the TIP schema and semantic rules, and then compares their identifiers and states with the handoff.
+
+Plain strings remain available for non-file evidence, but they do not replace the required source and target file references in a verified file-based bundle.
 
 ## Command
 
@@ -53,4 +70,4 @@ python -m tip validate-handoff \
   --tip examples/json/repository-next-step.tip.json
 ```
 
-A handoff is valid only when the three records are valid together.
+A handoff is valid only when the three records and their evidence are valid together.
