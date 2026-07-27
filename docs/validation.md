@@ -31,6 +31,10 @@ python -m tip validate-handoff \
 
 The handoff command checks the interface record together with the referenced IFP and TIP records.
 
+Repository file evidence uses `file:<repository-relative path>`. The validator rejects missing files, directories used as files, invalid JSON evidence, absolute paths, and paths that escape the repository root. A verified file-based bundle must reference the exact IFP source file and TIP target file passed to the command.
+
+The existence of an evidence file is only the first check. The IFP and TIP files are also validated against their own schemas and semantic rules before their identifiers and state mapping are compared with the handoff.
+
 ## Tests
 
 ```bash
@@ -52,7 +56,10 @@ The suite covers:
 - IFP readiness at handoff time;
 - explicit `readiness.next_protocol = TIP` at handoff time;
 - IFP ready-state and TIP state matching;
-- handoff verification evidence.
+- missing handoff evidence files;
+- malformed JSON evidence files;
+- evidence paths that escape the repository root;
+- exact source and target file evidence for verified bundles.
 
 Each semantic rule must have a matching negative test.
 
@@ -85,10 +92,13 @@ Supported subset:
 - `maximum`;
 - `additionalProperties: false`.
 
+File evidence validation currently applies to repository-relative `file:` references. Remote URLs, database identifiers, signatures, and content hashes are not yet verified.
+
 ## Future work
 
 - broader JSON Schema support;
 - recursive directory validation;
 - machine-readable CLI output;
 - automatic handoff discovery;
+- content hashes for immutable evidence;
 - review assurance reports.
