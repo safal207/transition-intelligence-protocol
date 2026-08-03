@@ -28,7 +28,19 @@
     ],
     "basis": "Early behavioral signals and limited user feedback",
     "parent_cause": null,
-    "confidence": 0.42
+    "confidence": 0.42,
+    "confidence_assessment": {
+      "assessor": "AI product analyst",
+      "assessor_type": "ai",
+      "method": "judgment",
+      "rationale": "The location of the drop-off and two support reports support the hypothesis, but the sample is too small to separate wording from other causes.",
+      "alternative_explanations": [
+        "technical latency may cause abandonment",
+        "users may not perceive enough underlying product value",
+        "pricing expectations may reduce motivation to finish setup"
+      ],
+      "human_confirmed": false
+    }
   },
   "transition": {
     "from": "unverified onboarding hypothesis",
