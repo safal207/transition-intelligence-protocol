@@ -80,6 +80,36 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1
+        },
+        "confidence_assessment": {
+          "type": "object",
+          "required": [
+            "assessor",
+            "assessor_type",
+            "method",
+            "rationale",
+            "alternative_explanations",
+            "human_confirmed"
+          ],
+          "properties": {
+            "assessor": { "type": "string" },
+            "assessor_type": {
+              "type": "string",
+              "enum": ["human", "ai", "team", "model", "mixed"]
+            },
+            "method": {
+              "type": "string",
+              "enum": ["judgment", "statistical", "calibrated_model", "mixed"]
+            },
+            "rationale": { "type": "string" },
+            "alternative_explanations": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "human_confirmed": { "type": "boolean" },
+            "calibration_reference": { "type": "string" }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
