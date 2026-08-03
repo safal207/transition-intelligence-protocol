@@ -107,6 +107,7 @@
               "items": { "type": "string" }
             },
             "human_confirmed": { "type": "boolean" },
+            "human_confirmer": { "type": "string" },
             "calibration_reference": { "type": "string" }
           },
           "additionalProperties": false
