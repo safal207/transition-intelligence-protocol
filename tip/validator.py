@@ -9,6 +9,9 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SCHEMA_PATH = ROOT / "schemas" / "tip-record.schema.json"
+LOW_CONFIDENCE_THRESHOLD = 0.5
+BOUNDED_IMPACT_SCOPES = {"local", "bounded"}
+FAST_FEEDBACK_LATENCIES = {"immediate", "short"}
 
 
 class ValidationResult:
@@ -122,18 +125,38 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
                 "$.action.summary: committed records require a concrete action summary"
             )
 
-    if status == "committed" and isinstance(cause, dict) and isinstance(transition, dict):
+    if (
+        status == "committed"
+        and isinstance(cause, dict)
+        and isinstance(transition, dict)
+        and isinstance(action, dict)
+    ):
         confidence = cause.get("confidence")
-        reversibility = transition.get("reversibility")
         if (
             isinstance(confidence, (int, float))
             and not isinstance(confidence, bool)
-            and confidence < 0.5
-            and reversibility == "low"
+            and confidence < LOW_CONFIDENCE_THRESHOLD
         ):
-            errors.append(
-                "$.cause.confidence: committed records with low-reversibility transitions require confidence of at least 0.5"
-            )
+            if transition.get("reversibility") != "high":
+                errors.append(
+                    "$.transition.reversibility: low-confidence commitments require high reversibility"
+                )
+
+            if transition.get("impact_scope") not in BOUNDED_IMPACT_SCOPES:
+                errors.append(
+                    "$.transition.impact_scope: low-confidence commitments require local or bounded impact"
+                )
+
+            if transition.get("feedback_latency") not in FAST_FEEDBACK_LATENCIES:
+                errors.append(
+                    "$.transition.feedback_latency: low-confidence commitments require immediate or short feedback"
+                )
+
+            review_after = action.get("review_after")
+            if not isinstance(review_after, str) or not review_after.strip():
+                errors.append(
+                    "$.action.review_after: low-confidence commitments require a concrete review point"
+                )
 
     if status == "reviewed":
         review_summary = review.get("summary") if isinstance(review, dict) else None
@@ -156,6 +179,11 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
     if defection_risk == "high" and recommendation == "commit":
         errors.append(
             "$.cooperation.recommendation: high defection risk cannot directly recommend 'commit'"
+        )
+
+    if status == "committed" and defection_risk == "high":
+        errors.append(
+            "$.cooperation.defection_risk: committed records cannot have high defection risk"
         )
 
     return errors
