@@ -48,7 +48,7 @@ Definition of Done:
 
 ### 1.2 Add more semantic invariants
 
-Status: In progress
+Status: In progress — implementation complete, visible CI confirmation pending
 
 Completed:
 
@@ -62,11 +62,15 @@ Completed:
 - handoff file evidence uses explicit repository-relative `file:` references;
 - missing files, malformed JSON, directories, absolute paths, and repository-root escapes are rejected;
 - verified file-based bundles must reference the exact IFP source and TIP target files;
-- evidence validation has positive and negative tests and is documented.
+- evidence validation has positive and negative tests and is documented;
+- low cause confidence below `0.5` cannot justify a committed transition with low reversibility;
+- the same low confidence may still justify a highly reversible pilot or evidence-gathering action;
+- positive and negative tests prove both sides of the risk-aware confidence policy;
+- the specification states that `0.5` is an operational guardrail, not a truth threshold.
 
 Remaining task:
 
-- define a justified policy for low cause confidence before blocking commitment.
+- confirm a visible CI run for the completed invariant set.
 
 Definition of Done:
 
