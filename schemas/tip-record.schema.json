@@ -95,6 +95,14 @@
           "type": "string",
           "enum": ["low", "medium", "high"]
         },
+        "impact_scope": {
+          "type": "string",
+          "enum": ["local", "bounded", "systemic"]
+        },
+        "feedback_latency": {
+          "type": "string",
+          "enum": ["immediate", "short", "long", "unknown"]
+        },
         "expected_consequence": { "type": "string" },
         "uncertainty": {
           "type": "string",
