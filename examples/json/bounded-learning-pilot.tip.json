@@ -1,0 +1,71 @@
+{
+  "id": "tip.example.bounded_learning_pilot",
+  "title": "Bounded pilot under causal uncertainty",
+  "status": "committed",
+  "state": {
+    "summary": "A product team suspects onboarding friction but does not yet know the main cause.",
+    "actors": ["product owner", "pilot users", "support team"],
+    "known_facts": [
+      "some users stop during onboarding",
+      "the current evidence does not isolate one cause"
+    ],
+    "constraints": [
+      "the full user base must not be exposed to an unproven change",
+      "feedback should arrive before any broader rollout"
+    ]
+  },
+  "tension": {
+    "summary": "The team needs new evidence without turning a weak hypothesis into a system-wide decision.",
+    "kind": "ambiguity",
+    "severity": "medium"
+  },
+  "cause": {
+    "cause_type": "constraint",
+    "summary": "A confusing first step may be contributing to onboarding abandonment.",
+    "supporting_signals": [
+      "drop-off occurs near the first setup step",
+      "two support messages mention unclear wording"
+    ],
+    "basis": "Early behavioral signals and limited user feedback",
+    "parent_cause": null,
+    "confidence": 0.42
+  },
+  "transition": {
+    "from": "unverified onboarding hypothesis",
+    "to": "observed evidence from a bounded pilot",
+    "trigger": "need to distinguish the suspected cause from alternatives",
+    "reversibility": "high",
+    "impact_scope": "bounded",
+    "feedback_latency": "short",
+    "expected_consequence": "The team gains evidence without changing onboarding for the full user base.",
+    "uncertainty": "high"
+  },
+  "cooperation": {
+    "participants": [
+      {
+        "name": "product owner",
+        "goal": "learn quickly without premature rollout",
+        "risk": "treating a weak signal as proof"
+      },
+      {
+        "name": "pilot users",
+        "goal": "complete onboarding with less confusion",
+        "risk": "receiving an experimental flow"
+      },
+      {
+        "name": "support team",
+        "goal": "observe whether questions change",
+        "risk": "drawing conclusions from too few cases"
+      }
+    ],
+    "shared_upside": "The suspected cause can be tested while exposure and recovery cost remain limited.",
+    "defection_risk": "low",
+    "stability": "stable",
+    "recommendation": "clarify"
+  },
+  "action": {
+    "summary": "Run the revised first step with five consenting pilot users and keep the original flow available.",
+    "review_after": "after five pilot sessions or the first harmful signal",
+    "owner": "product owner"
+  }
+}
