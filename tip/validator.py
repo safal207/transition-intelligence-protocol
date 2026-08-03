@@ -12,6 +12,8 @@ DEFAULT_SCHEMA_PATH = ROOT / "schemas" / "tip-record.schema.json"
 LOW_CONFIDENCE_THRESHOLD = 0.5
 BOUNDED_IMPACT_SCOPES = {"local", "bounded"}
 FAST_FEEDBACK_LATENCIES = {"immediate", "short"}
+HIGH_CONSEQUENCE_FEEDBACK_LATENCIES = {"long", "unknown"}
+CALIBRATION_METHODS = {"statistical", "calibrated_model"}
 
 
 class ValidationResult:
@@ -51,6 +53,10 @@ def _type_is_valid(value: Any, expected_type: Any) -> bool:
     if isinstance(expected_type, list):
         return any(isinstance(item, str) and _matches_type(value, item) for item in expected_type)
     return True
+
+
+def _is_nonblank_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
 
 
 def validate_schema_subset(
@@ -105,6 +111,57 @@ def validate_schema_subset(
     return errors
 
 
+def _validate_confidence_assessment(
+    assessment: Any,
+    transition: dict[str, Any],
+) -> list[str]:
+    """Validate provenance and escalation rules for a committed confidence value."""
+
+    errors: list[str] = []
+    if not isinstance(assessment, dict):
+        return [
+            "$.cause.confidence_assessment: committed records require confidence provenance"
+        ]
+
+    if not _is_nonblank_string(assessment.get("assessor")):
+        errors.append(
+            "$.cause.confidence_assessment.assessor: committed records require a named assessor"
+        )
+
+    if not _is_nonblank_string(assessment.get("rationale")):
+        errors.append(
+            "$.cause.confidence_assessment.rationale: committed records require a concrete confidence rationale"
+        )
+
+    alternatives = assessment.get("alternative_explanations")
+    if not isinstance(alternatives, list) or not any(
+        _is_nonblank_string(item) for item in alternatives
+    ):
+        errors.append(
+            "$.cause.confidence_assessment.alternative_explanations: committed records require at least one considered alternative"
+        )
+
+    method = assessment.get("method")
+    if method in CALIBRATION_METHODS and not _is_nonblank_string(
+        assessment.get("calibration_reference")
+    ):
+        errors.append(
+            "$.cause.confidence_assessment.calibration_reference: statistical or calibrated confidence requires a calibration reference"
+        )
+
+    high_consequence = (
+        transition.get("reversibility") == "low"
+        or transition.get("impact_scope") == "systemic"
+        or transition.get("feedback_latency") in HIGH_CONSEQUENCE_FEEDBACK_LATENCIES
+    )
+    if high_consequence and assessment.get("human_confirmed") is not True:
+        errors.append(
+            "$.cause.confidence_assessment.human_confirmed: high-consequence commitments require human confirmation"
+        )
+
+    return errors
+
+
 def validate_invariants(data: dict[str, Any]) -> list[str]:
     """Validate semantic TIP rules that have explicit negative tests."""
 
@@ -118,9 +175,7 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
 
     if isinstance(action, dict):
         action_summary = action.get("summary")
-        if status == "committed" and (
-            not isinstance(action_summary, str) or not action_summary.strip()
-        ):
+        if status == "committed" and not _is_nonblank_string(action_summary):
             errors.append(
                 "$.action.summary: committed records require a concrete action summary"
             )
@@ -131,6 +186,13 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
         and isinstance(transition, dict)
         and isinstance(action, dict)
     ):
+        errors.extend(
+            _validate_confidence_assessment(
+                cause.get("confidence_assessment"),
+                transition,
+            )
+        )
+
         confidence = cause.get("confidence")
         if (
             isinstance(confidence, (int, float))
@@ -153,14 +215,14 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
                 )
 
             review_after = action.get("review_after")
-            if not isinstance(review_after, str) or not review_after.strip():
+            if not _is_nonblank_string(review_after):
                 errors.append(
                     "$.action.review_after: low-confidence commitments require a concrete review point"
                 )
 
     if status == "reviewed":
         review_summary = review.get("summary") if isinstance(review, dict) else None
-        if not isinstance(review_summary, str) or not review_summary.strip():
+        if not _is_nonblank_string(review_summary):
             errors.append(
                 "$.review.summary: reviewed records require concrete review notes"
             )
