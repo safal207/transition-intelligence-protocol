@@ -10,6 +10,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SCHEMA_PATH = ROOT / "schemas" / "tip-record.schema.json"
 LOW_CONFIDENCE_THRESHOLD = 0.5
+ALL_IMPACT_SCOPES = {"local", "bounded", "systemic"}
+ALL_FEEDBACK_LATENCIES = {"immediate", "short", "long", "unknown"}
 BOUNDED_IMPACT_SCOPES = {"local", "bounded"}
 FAST_FEEDBACK_LATENCIES = {"immediate", "short"}
 HIGH_CONSEQUENCE_FEEDBACK_LATENCIES = {"long", "unknown"}
@@ -149,12 +151,18 @@ def _validate_confidence_assessment(
             "$.cause.confidence_assessment.calibration_reference: statistical or calibrated confidence requires a calibration reference"
         )
 
+    human_confirmed = assessment.get("human_confirmed") is True
+    if human_confirmed and not _is_nonblank_string(assessment.get("human_confirmer")):
+        errors.append(
+            "$.cause.confidence_assessment.human_confirmer: human confirmation requires a named confirmer"
+        )
+
     high_consequence = (
         transition.get("reversibility") == "low"
         or transition.get("impact_scope") == "systemic"
         or transition.get("feedback_latency") in HIGH_CONSEQUENCE_FEEDBACK_LATENCIES
     )
-    if high_consequence and assessment.get("human_confirmed") is not True:
+    if high_consequence and not human_confirmed:
         errors.append(
             "$.cause.confidence_assessment.human_confirmed: high-consequence commitments require human confirmation"
         )
@@ -186,6 +194,15 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
         and isinstance(transition, dict)
         and isinstance(action, dict)
     ):
+        if transition.get("impact_scope") not in ALL_IMPACT_SCOPES:
+            errors.append(
+                "$.transition.impact_scope: committed records require an explicit impact scope"
+            )
+        if transition.get("feedback_latency") not in ALL_FEEDBACK_LATENCIES:
+            errors.append(
+                "$.transition.feedback_latency: committed records require an explicit feedback latency"
+            )
+
         errors.extend(
             _validate_confidence_assessment(
                 cause.get("confidence_assessment"),
