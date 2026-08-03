@@ -70,7 +70,14 @@ Completed:
 - committed records cannot hide high cooperation defection risk;
 - separate negative tests identify failures in reversibility, spatial reach, feedback latency, review planning, and cooperation stability;
 - `bounded-learning-pilot.tip.json` demonstrates a valid evidence-producing commitment under low confidence;
-- the specification states that `0.5` is an operational guardrail, not a truth threshold.
+- the specification states that `0.5` is an operational guardrail, not a truth threshold;
+- committed records now require a `confidence_assessment` provenance object;
+- confidence provenance records the assessor, assessor type, method, rationale, alternative explanations, and human confirmation state;
+- statistical and calibrated-model assessments require a calibration reference;
+- high-consequence commitments require explicit human confirmation;
+- bounded reversible pilots may use AI assessment without pretending that the estimate is human-confirmed;
+- negative tests cover missing provenance, missing alternatives, missing calibration evidence, and missing human confirmation;
+- positive tests cover human-confirmed high-consequence action and bounded AI-assessed experimentation.
 
 Remaining task:
 
