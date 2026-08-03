@@ -68,10 +68,11 @@ Transition Intelligence asks:
 1. What state are we in?
 2. What tension is creating pressure for change?
 3. What cause makes the transition meaningful?
-4. What transition is likely to happen?
-5. Will the transition preserve cooperation?
-6. What action is justified now?
-7. What was actually observed after the action?
+4. Who assessed confidence in that cause, by what method, and what alternatives remain?
+5. What transition is likely to happen?
+6. Will the transition preserve cooperation?
+7. What action is justified now?
+8. What was actually observed after the action?
 
 This makes the protocol useful for human-AI cooperation, agent safety, strategic decisions, startup pivots, conflict analysis, and systems where a wrong transition can create long-term damage.
 
@@ -133,9 +134,11 @@ Tension
 
 Cause
   -> why a transition is happening
+  -> who assessed confidence, how, and against which alternatives
 
 Transition
   -> movement from one state to another
+  -> spatial reach, feedback delay, and reversibility
 
 Cooperation
   -> whether the new state remains stable among participants
@@ -167,6 +170,7 @@ transition-intelligence-protocol/
   examples/
     json/
       startup-pivot.tip.json
+      bounded-learning-pilot.tip.json
       human-ai-agent.tip.json
       family-conflict.tip.json
       repository-next-step.tip.json
@@ -211,6 +215,7 @@ Current focus:
 - keep TIP and IFP records small and inspectable;
 - require negative tests for semantic rules;
 - preserve explicit provenance from IFP readiness into TIP state reasoning;
+- preserve confidence provenance before a value can authorize committed action;
 - close the action-to-review loop without claiming more causality than the evidence supports;
 - avoid splitting protocols into separate repositories before their interfaces stabilize.
 
