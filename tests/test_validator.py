@@ -66,6 +66,41 @@ class ValidatorTests(unittest.TestCase):
             result.errors,
         )
 
+    def test_low_confidence_cannot_commit_low_reversibility_transition(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.49
+        data["transition"]["reversibility"] = "low"
+        data["action"]["summary"] = "Make the difficult-to-reverse change."
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "low-confidence-irreversible.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "low-reversibility transitions require confidence of at least 0.5" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_low_confidence_can_commit_high_reversibility_pilot(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.49
+        data["transition"]["reversibility"] = "high"
+        data["action"]["summary"] = "Run one reversible pilot to collect evidence."
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "low-confidence-reversible-pilot.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertTrue(result.ok, result.errors)
+
     def test_reviewed_record_requires_concrete_review_notes(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "reviewed"
