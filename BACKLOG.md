@@ -63,9 +63,13 @@ Completed:
 - missing files, malformed JSON, directories, absolute paths, and repository-root escapes are rejected;
 - verified file-based bundles must reference the exact IFP source and TIP target files;
 - evidence validation has positive and negative tests and is documented;
-- low cause confidence below `0.5` cannot justify a committed transition with low reversibility;
-- the same low confidence may still justify a highly reversible pilot or evidence-gathering action;
-- positive and negative tests prove both sides of the risk-aware confidence policy;
+- the first confidence guard blocked low-confidence, low-reversibility commitments while allowing reversible pilots;
+- a causal space-time transition audit found that reversibility alone did not constrain impact scope or feedback delay;
+- the transition schema now supports `impact_scope` and `feedback_latency`;
+- low-confidence commitments now require high reversibility, local or bounded impact, immediate or short feedback, and a concrete review point;
+- committed records cannot hide high cooperation defection risk;
+- separate negative tests identify failures in reversibility, spatial reach, feedback latency, review planning, and cooperation stability;
+- `bounded-learning-pilot.tip.json` demonstrates a valid evidence-producing commitment under low confidence;
 - the specification states that `0.5` is an operational guardrail, not a truth threshold.
 
 Remaining task:
