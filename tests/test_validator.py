@@ -14,6 +14,26 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "tests" / "fixtures"
 
 
+def add_confidence_assessment(
+    data: dict,
+    *,
+    human_confirmed: bool = False,
+    assessor_type: str = "ai",
+    method: str = "judgment",
+) -> None:
+    assessment = {
+        "assessor": "test assessor",
+        "assessor_type": assessor_type,
+        "method": method,
+        "rationale": "Observed signals support the cause, while uncertainty remains explicit.",
+        "alternative_explanations": ["another cause may explain the same signals"],
+        "human_confirmed": human_confirmed,
+    }
+    if method in {"statistical", "calibrated_model"}:
+        assessment["calibration_reference"] = "test calibration record"
+    data["cause"]["confidence_assessment"] = assessment
+
+
 class ValidatorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -50,6 +70,7 @@ class ValidatorTests(unittest.TestCase):
     def test_committed_record_requires_concrete_action_summary(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data)
         data["action"]["summary"] = "   "
 
         with tempfile.TemporaryDirectory() as directory:
@@ -66,9 +87,107 @@ class ValidatorTests(unittest.TestCase):
             result.errors,
         )
 
+    def test_committed_record_requires_confidence_provenance(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "committed-without-confidence-provenance.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "committed records require confidence provenance" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_committed_confidence_requires_considered_alternative(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        add_confidence_assessment(data)
+        data["cause"]["confidence_assessment"]["alternative_explanations"] = []
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "committed-without-alternative.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "require at least one considered alternative" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_statistical_confidence_requires_calibration_reference(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        add_confidence_assessment(data, method="statistical")
+        del data["cause"]["confidence_assessment"]["calibration_reference"]
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "statistical-without-calibration.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "requires a calibration reference" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_high_consequence_commit_requires_human_confirmation(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.8
+        add_confidence_assessment(data, human_confirmed=False)
+        data["transition"]["reversibility"] = "low"
+        data["transition"]["impact_scope"] = "bounded"
+        data["transition"]["feedback_latency"] = "short"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "high-consequence-without-human.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "high-consequence commitments require human confirmation" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_high_consequence_commit_with_human_confirmation_passes(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.8
+        add_confidence_assessment(data, human_confirmed=True)
+        data["transition"]["reversibility"] = "low"
+        data["transition"]["impact_scope"] = "bounded"
+        data["transition"]["feedback_latency"] = "short"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "high-consequence-with-human.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertTrue(result.ok, result.errors)
+
     def test_low_confidence_commit_requires_high_reversibility(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "medium"
         data["transition"]["impact_scope"] = "bounded"
@@ -92,6 +211,7 @@ class ValidatorTests(unittest.TestCase):
     def test_low_confidence_commit_requires_bounded_impact(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data, human_confirmed=True)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
         data["transition"]["impact_scope"] = "systemic"
@@ -115,6 +235,7 @@ class ValidatorTests(unittest.TestCase):
     def test_low_confidence_commit_requires_fast_feedback(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data, human_confirmed=True)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
         data["transition"]["impact_scope"] = "bounded"
@@ -138,6 +259,7 @@ class ValidatorTests(unittest.TestCase):
     def test_low_confidence_commit_requires_review_point(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
         data["transition"]["impact_scope"] = "bounded"
@@ -157,9 +279,10 @@ class ValidatorTests(unittest.TestCase):
             result.errors,
         )
 
-    def test_low_confidence_can_commit_bounded_reversible_pilot(self) -> None:
+    def test_low_confidence_ai_can_commit_bounded_reversible_pilot(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data, human_confirmed=False, assessor_type="ai")
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
         data["transition"]["impact_scope"] = "bounded"
@@ -177,6 +300,7 @@ class ValidatorTests(unittest.TestCase):
     def test_committed_record_cannot_have_high_defection_risk(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
+        add_confidence_assessment(data)
         data["cooperation"]["defection_risk"] = "high"
         data["cooperation"]["recommendation"] = "clarify"
 
