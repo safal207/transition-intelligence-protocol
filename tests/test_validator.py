@@ -66,40 +66,133 @@ class ValidatorTests(unittest.TestCase):
             result.errors,
         )
 
-    def test_low_confidence_cannot_commit_low_reversibility_transition(self) -> None:
+    def test_low_confidence_commit_requires_high_reversibility(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
         data["cause"]["confidence"] = 0.49
-        data["transition"]["reversibility"] = "low"
-        data["action"]["summary"] = "Make the difficult-to-reverse change."
+        data["transition"]["reversibility"] = "medium"
+        data["transition"]["impact_scope"] = "bounded"
+        data["transition"]["feedback_latency"] = "short"
+        data["action"]["review_after"] = "after the pilot"
 
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "low-confidence-irreversible.tip.json"
+            path = Path(directory) / "low-confidence-medium-reversibility.tip.json"
             path.write_text(json.dumps(data), encoding="utf-8")
             result = validate_file(path, self.schema)
 
         self.assertFalse(result.ok)
         self.assertTrue(
             any(
-                "low-reversibility transitions require confidence of at least 0.5" in error
+                "low-confidence commitments require high reversibility" in error
                 for error in result.errors
             ),
             result.errors,
         )
 
-    def test_low_confidence_can_commit_high_reversibility_pilot(self) -> None:
+    def test_low_confidence_commit_requires_bounded_impact(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
-        data["action"]["summary"] = "Run one reversible pilot to collect evidence."
+        data["transition"]["impact_scope"] = "systemic"
+        data["transition"]["feedback_latency"] = "short"
+        data["action"]["review_after"] = "after the pilot"
 
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "low-confidence-reversible-pilot.tip.json"
+            path = Path(directory) / "low-confidence-systemic-impact.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "low-confidence commitments require local or bounded impact" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_low_confidence_commit_requires_fast_feedback(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.49
+        data["transition"]["reversibility"] = "high"
+        data["transition"]["impact_scope"] = "bounded"
+        data["transition"]["feedback_latency"] = "long"
+        data["action"]["review_after"] = "after the pilot"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "low-confidence-long-feedback.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "low-confidence commitments require immediate or short feedback" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_low_confidence_commit_requires_review_point(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.49
+        data["transition"]["reversibility"] = "high"
+        data["transition"]["impact_scope"] = "bounded"
+        data["transition"]["feedback_latency"] = "short"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "low-confidence-without-review-point.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "low-confidence commitments require a concrete review point" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
+
+    def test_low_confidence_can_commit_bounded_reversible_pilot(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cause"]["confidence"] = 0.49
+        data["transition"]["reversibility"] = "high"
+        data["transition"]["impact_scope"] = "bounded"
+        data["transition"]["feedback_latency"] = "short"
+        data["action"]["summary"] = "Run one bounded reversible pilot to collect evidence."
+        data["action"]["review_after"] = "after five pilot sessions"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "low-confidence-bounded-pilot.tip.json"
             path.write_text(json.dumps(data), encoding="utf-8")
             result = validate_file(path, self.schema)
 
         self.assertTrue(result.ok, result.errors)
+
+    def test_committed_record_cannot_have_high_defection_risk(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        data["cooperation"]["defection_risk"] = "high"
+        data["cooperation"]["recommendation"] = "clarify"
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "committed-high-defection-risk.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any(
+                "committed records cannot have high defection risk" in error
+                for error in result.errors
+            ),
+            result.errors,
+        )
 
     def test_reviewed_record_requires_concrete_review_notes(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
