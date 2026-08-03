@@ -29,7 +29,8 @@
         "onboarding friction may suppress otherwise real demand",
         "the current users may not represent the intended market"
       ],
-      "human_confirmed": true
+      "human_confirmed": true,
+      "human_confirmer": "founder"
     }
   },
   "transition": {
