@@ -29,9 +29,13 @@ def add_confidence_assessment(
         "alternative_explanations": ["another cause may explain the same signals"],
         "human_confirmed": human_confirmed,
     }
+    if human_confirmed:
+        assessment["human_confirmer"] = "test human confirmer"
     if method in {"statistical", "calibrated_model"}:
         assessment["calibration_reference"] = "test calibration record"
     data["cause"]["confidence_assessment"] = assessment
+    data["transition"].setdefault("impact_scope", "bounded")
+    data["transition"].setdefault("feedback_latency", "short")
 
 
 class ValidatorTests(unittest.TestCase):
@@ -105,6 +109,28 @@ class ValidatorTests(unittest.TestCase):
             result.errors,
         )
 
+    def test_committed_record_requires_consequence_coordinates(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        add_confidence_assessment(data)
+        del data["transition"]["impact_scope"]
+        del data["transition"]["feedback_latency"]
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "committed-without-consequence-coordinates.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("require an explicit impact scope" in error for error in result.errors),
+            result.errors,
+        )
+        self.assertTrue(
+            any("require an explicit feedback latency" in error for error in result.errors),
+            result.errors,
+        )
+
     def test_committed_confidence_requires_considered_alternative(self) -> None:
         data = load_json(FIXTURES / "valid" / "minimal.tip.json")
         data["status"] = "committed"
@@ -138,10 +164,24 @@ class ValidatorTests(unittest.TestCase):
 
         self.assertFalse(result.ok)
         self.assertTrue(
-            any(
-                "requires a calibration reference" in error
-                for error in result.errors
-            ),
+            any("requires a calibration reference" in error for error in result.errors),
+            result.errors,
+        )
+
+    def test_human_confirmation_requires_named_confirmer(self) -> None:
+        data = load_json(FIXTURES / "valid" / "minimal.tip.json")
+        data["status"] = "committed"
+        add_confidence_assessment(data, human_confirmed=True)
+        del data["cause"]["confidence_assessment"]["human_confirmer"]
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "anonymous-human-confirmation.tip.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            result = validate_file(path, self.schema)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(
+            any("requires a named confirmer" in error for error in result.errors),
             result.errors,
         )
 
@@ -151,8 +191,6 @@ class ValidatorTests(unittest.TestCase):
         data["cause"]["confidence"] = 0.8
         add_confidence_assessment(data, human_confirmed=False)
         data["transition"]["reversibility"] = "low"
-        data["transition"]["impact_scope"] = "bounded"
-        data["transition"]["feedback_latency"] = "short"
 
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "high-consequence-without-human.tip.json"
@@ -174,8 +212,6 @@ class ValidatorTests(unittest.TestCase):
         data["cause"]["confidence"] = 0.8
         add_confidence_assessment(data, human_confirmed=True)
         data["transition"]["reversibility"] = "low"
-        data["transition"]["impact_scope"] = "bounded"
-        data["transition"]["feedback_latency"] = "short"
 
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "high-consequence-with-human.tip.json"
@@ -190,8 +226,6 @@ class ValidatorTests(unittest.TestCase):
         add_confidence_assessment(data)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "medium"
-        data["transition"]["impact_scope"] = "bounded"
-        data["transition"]["feedback_latency"] = "short"
         data["action"]["review_after"] = "after the pilot"
 
         with tempfile.TemporaryDirectory() as directory:
@@ -215,7 +249,6 @@ class ValidatorTests(unittest.TestCase):
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
         data["transition"]["impact_scope"] = "systemic"
-        data["transition"]["feedback_latency"] = "short"
         data["action"]["review_after"] = "after the pilot"
 
         with tempfile.TemporaryDirectory() as directory:
@@ -238,7 +271,6 @@ class ValidatorTests(unittest.TestCase):
         add_confidence_assessment(data, human_confirmed=True)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
-        data["transition"]["impact_scope"] = "bounded"
         data["transition"]["feedback_latency"] = "long"
         data["action"]["review_after"] = "after the pilot"
 
@@ -262,8 +294,6 @@ class ValidatorTests(unittest.TestCase):
         add_confidence_assessment(data)
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
-        data["transition"]["impact_scope"] = "bounded"
-        data["transition"]["feedback_latency"] = "short"
 
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "low-confidence-without-review-point.tip.json"
@@ -285,8 +315,6 @@ class ValidatorTests(unittest.TestCase):
         add_confidence_assessment(data, human_confirmed=False, assessor_type="ai")
         data["cause"]["confidence"] = 0.49
         data["transition"]["reversibility"] = "high"
-        data["transition"]["impact_scope"] = "bounded"
-        data["transition"]["feedback_latency"] = "short"
         data["action"]["summary"] = "Run one bounded reversible pilot to collect evidence."
         data["action"]["review_after"] = "after five pilot sessions"
 
