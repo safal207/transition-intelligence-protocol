@@ -107,6 +107,8 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
 
     errors: list[str] = []
     status = data.get("status")
+    cause = data.get("cause")
+    transition = data.get("transition")
     cooperation = data.get("cooperation")
     action = data.get("action")
     review = data.get("review")
@@ -118,6 +120,19 @@ def validate_invariants(data: dict[str, Any]) -> list[str]:
         ):
             errors.append(
                 "$.action.summary: committed records require a concrete action summary"
+            )
+
+    if status == "committed" and isinstance(cause, dict) and isinstance(transition, dict):
+        confidence = cause.get("confidence")
+        reversibility = transition.get("reversibility")
+        if (
+            isinstance(confidence, (int, float))
+            and not isinstance(confidence, bool)
+            and confidence < 0.5
+            and reversibility == "low"
+        ):
+            errors.append(
+                "$.cause.confidence: committed records with low-reversibility transitions require confidence of at least 0.5"
             )
 
     if status == "reviewed":
