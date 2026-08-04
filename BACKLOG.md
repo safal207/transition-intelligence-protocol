@@ -105,9 +105,9 @@ Completed:
 - canonical TIP, IFP, handoff, and unittest commands must match across README, CLI docs, validation docs, and the GitHub Actions workflow;
 - handoff surfaces must reference `examples/handoff/project-to-next-step.handoff.json`;
 - release-scope artifacts must exist and remain explicitly listed in `ROADMAP.md`;
-- README structure entries are checked for canonical validators, tests, and the bounded learning example;
-- `ROADMAP.md`, `README.md`, and `docs/validation.md` were synchronized with current executable behavior;
-- a synthetic positive run passed all four documentation tests;
+- README structure entries are checked for canonical validators, tests, examples, and tuning guidance;
+- canonical protocol-boundary language is checked across README, IFP spec, TIP spec, and handoff spec;
+- the seven tuning agents and their authority limits are checked in `docs/tuning-agents.md`;
 - deliberate broken-link and stale-command mutations were rejected before the clean suite passed again.
 
 Remaining task:
@@ -121,15 +121,24 @@ Definition of Done:
 
 ### 2.2 Consolidate protocol contract language
 
-Status: Planned
+Status: In progress — implementation complete, visible CI confirmation pending
 
-Tasks:
+Completed:
 
-- keep IFP focused on readiness only;
-- keep TIP focused on transitions only;
-- keep handoff as an interface contract, not a protocol;
-- document that IFP is optional when the starting state is already known and sufficient;
-- remove duplicate handoff descriptions when they drift.
+- IFP is explicitly limited to readiness;
+- TIP is explicitly limited to transition, cooperation, action, and review reasoning;
+- IFP is optional when a TIP starting state is already trusted and sufficient;
+- an explicit handoff is required when IFP supplies the TIP starting state;
+- the handoff is consistently defined as an interface contract rather than a third protocol;
+- standalone TIP records are prohibited from claiming IFP provenance without a valid handoff;
+- duplicate handoff record guidance was removed from the IFP specification in favor of the canonical handoff contract;
+- README, IFP spec, TIP spec, and handoff spec use the same four canonical boundary statements;
+- `docs/tuning-agents.md` defines Idea, Project, Implementation, Customer, Repository, Stabilizer, and Innovator review lenses without creating new protocol authority;
+- documentation tests fail when a canonical boundary or tuning-agent limit drifts.
+
+Remaining task:
+
+- confirm a visible CI run for the consolidated contract language.
 
 Definition of Done:
 
