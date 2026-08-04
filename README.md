@@ -40,7 +40,7 @@ Specification: [`spec/v0.1.md`](spec/v0.1.md)
 
 ### Explicit handoff
 
-The handoff is an interface contract, not a third protocol:
+The handoff connects a verified IFP ready state to the exact TIP state that consumes it:
 
 ```text
 IFP Ready State
@@ -51,11 +51,20 @@ IFP Ready State
 
 Handoff contract: [`protocols/ifp/tip-handoff.md`](protocols/ifp/tip-handoff.md)
 
+### Canonical boundaries
+
+- IFP establishes readiness; TIP reasons about transitions.
+- IFP is optional when the TIP starting state is already trusted and sufficient.
+- When IFP supplies the TIP starting state, the explicit handoff contract is required.
+- The handoff is an interface contract, not a third protocol.
+
 IFP answers: **Is the system ready to begin?**
 
 TIP answers: **What transition is justified next, and what happened when it was reviewed?**
 
-The handoff answers: **Did this exact ready state become this exact TIP state?**
+The handoff answers: **Did this exact IFP ready state become this exact TIP state?**
+
+A standalone TIP record does not need an artificial IFP record when its starting state is already trusted and sufficient. It must not claim IFP provenance unless the explicit handoff is present and valid.
 
 ## Why this exists
 
@@ -150,6 +159,12 @@ Review
   -> the observed result, evidence, and next state after action
 ```
 
+## Implementation tuning
+
+Changes may be reviewed through seven named tuning lenses: Idea Analyst, Project Analyst, Implementation Analyst, Customer Advocate, Repository Reviewer, Stabilizer, and Innovator.
+
+These are review perspectives, not additional protocols or autonomous authorities. Their responsibilities and conflict rules are documented in [`docs/tuning-agents.md`](docs/tuning-agents.md).
+
 ## Repository structure
 
 ```text
@@ -192,6 +207,7 @@ transition-intelligence-protocol/
   docs/
     cli.md
     validation.md
+    tuning-agents.md
   scripts/
     validate_examples.py
 ```
@@ -218,7 +234,8 @@ Current focus:
 - preserve explicit provenance from IFP readiness into TIP state reasoning;
 - preserve confidence provenance before a value can authorize committed action;
 - close the action-to-review loop without claiming more causality than the evidence supports;
-- keep canonical documentation links and commands synchronized with executable behavior;
+- keep canonical protocol boundaries, documentation links, and commands synchronized with executable behavior;
+- use tuning agents as bounded review lenses rather than adding new protocols;
 - avoid splitting protocols into separate repositories before their interfaces stabilize.
 
 ## License
