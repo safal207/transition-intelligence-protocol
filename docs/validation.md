@@ -64,9 +64,13 @@ The suite covers:
 - repository-local Markdown links;
 - canonical CLI command consistency across README, CLI docs, validation docs, and workflow;
 - canonical handoff references;
-- release-scope artifact existence and README structure entries.
+- release-scope artifact existence and README structure entries;
+- canonical IFP, TIP, and handoff boundary language across all contract surfaces;
+- completeness and bounded authority of the seven implementation tuning agents.
 
-`tests/test_documentation.py` keeps human-facing documentation aligned with executable repository behavior. A stale command, broken local link, missing release artifact, or outdated canonical path fails the normal test command and therefore the existing CI workflow.
+`tests/test_documentation.py` keeps human-facing documentation aligned with executable repository behavior. A stale command, broken local link, missing release artifact, outdated canonical path, missing protocol boundary, or drifted tuning-agent definition fails the normal test command and therefore the existing CI workflow.
+
+The tuning agents are documented in [`tuning-agents.md`](tuning-agents.md). They are review lenses rather than new protocols or autonomous authorities.
 
 Each semantic rule must have a matching negative test. Each documentation contract must have a repository assertion that fails when the contract drifts.
 
@@ -101,7 +105,7 @@ Supported subset:
 
 File evidence validation currently applies to repository-relative `file:` references. Remote URLs, database identifiers, signatures, and content hashes are not yet verified.
 
-Documentation tests validate repository-local paths and canonical command text. They do not make external websites available or prove that external links remain healthy.
+Documentation tests validate repository-local paths, canonical command text, contract language, and tuning-agent boundaries. They do not make external websites available, prove that external links remain healthy, or execute autonomous agent reasoning.
 
 ## Future work
 
