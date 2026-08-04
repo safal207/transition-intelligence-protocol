@@ -51,6 +51,7 @@ The suite covers:
 - malformed JSON handling;
 - empty directory handling;
 - TIP semantic rules;
+- confidence provenance and high-consequence human escalation;
 - IFP readiness rules;
 - handoff record ID matching;
 - IFP readiness at handoff time;
@@ -59,9 +60,15 @@ The suite covers:
 - missing handoff evidence files;
 - malformed JSON evidence files;
 - evidence paths that escape the repository root;
-- exact source and target file evidence for verified bundles.
+- exact source and target file evidence for verified bundles;
+- repository-local Markdown links;
+- canonical CLI command consistency across README, CLI docs, validation docs, and workflow;
+- canonical handoff references;
+- release-scope artifact existence and README structure entries.
 
-Each semantic rule must have a matching negative test.
+`tests/test_documentation.py` keeps human-facing documentation aligned with executable repository behavior. A stale command, broken local link, missing release artifact, or outdated canonical path fails the normal test command and therefore the existing CI workflow.
+
+Each semantic rule must have a matching negative test. Each documentation contract must have a repository assertion that fails when the contract drifts.
 
 ## CI
 
@@ -93,6 +100,8 @@ Supported subset:
 - `additionalProperties: false`.
 
 File evidence validation currently applies to repository-relative `file:` references. Remote URLs, database identifiers, signatures, and content hashes are not yet verified.
+
+Documentation tests validate repository-local paths and canonical command text. They do not make external websites available or prove that external links remain healthy.
 
 ## Future work
 
