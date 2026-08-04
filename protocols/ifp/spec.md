@@ -20,10 +20,22 @@ Undefined
 
 A blocked initialization may stop before `Ready`.
 
+## Canonical boundaries
+
+- IFP establishes readiness; TIP reasons about transitions.
+- IFP is optional when the TIP starting state is already trusted and sufficient.
+- When IFP supplies the TIP starting state, the explicit handoff contract is required.
+- The handoff is an interface contract, not a third protocol.
+
+IFP should be used when the starting state still needs configuration, observation, correction, or readiness evidence. It should not be created only to satisfy ceremony around a TIP record whose state is already trusted and sufficient.
+
 ## Relationship with TIP
+
+When IFP supplies the starting state, the relationship is:
 
 ```text
 IFP Ready State
+-> verified handoff record
 -> TIP State
 -> Tension
 -> Cause
@@ -32,7 +44,9 @@ IFP Ready State
 -> Action
 ```
 
-IFP establishes a trustworthy starting point. TIP reasons about the next transition from that point.
+The handoff proves that the exact checked state produced by IFP became the exact state consumed by TIP. It does not authorize the later transition or action.
+
+The canonical interface is documented in [`tip-handoff.md`](tip-handoff.md). This specification intentionally does not duplicate the handoff record shape.
 
 ## IFP Record
 
@@ -68,16 +82,6 @@ blocked
 
 ## Handoff to TIP
 
-A ready IFP record may provide the initial state for a TIP record.
+A ready IFP record may provide the initial state for a TIP record only through the explicit handoff contract.
 
-Recommended handoff fields:
-
-```json
-{
-  "source_protocol": "IFP",
-  "source_record_id": "ifp.example.project",
-  "ready_state": "Repository initialized and validation feedback passed"
-}
-```
-
-The handoff does not guarantee that every future action is valid. It only establishes that the starting state has been checked.
+The handoff preserves the source record, ready state, target TIP record, consumed TIP state, and verification evidence. A valid handoff establishes provenance for the starting state; it does not guarantee that every future action is valid.
