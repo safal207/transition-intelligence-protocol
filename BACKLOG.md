@@ -96,14 +96,23 @@ Goal: prevent README, specs, schemas, examples, validators, and CI from drifting
 
 ### 2.1 Add documentation consistency tests
 
-Status: Planned
+Status: In progress — implementation complete, visible CI confirmation pending
 
-Tasks:
+Completed:
 
-- verify CLI commands in docs match workflow commands;
-- verify README links point to existing canonical files;
-- verify handoff docs reference the canonical handoff example;
-- verify roadmap release scope matches existing files.
+- added `tests/test_documentation.py`;
+- repository-local Markdown links must resolve to existing paths inside the repository root;
+- canonical TIP, IFP, handoff, and unittest commands must match across README, CLI docs, validation docs, and the GitHub Actions workflow;
+- handoff surfaces must reference `examples/handoff/project-to-next-step.handoff.json`;
+- release-scope artifacts must exist and remain explicitly listed in `ROADMAP.md`;
+- README structure entries are checked for canonical validators, tests, and the bounded learning example;
+- `ROADMAP.md`, `README.md`, and `docs/validation.md` were synchronized with current executable behavior;
+- a synthetic positive run passed all four documentation tests;
+- deliberate broken-link and stale-command mutations were rejected before the clean suite passed again.
+
+Remaining task:
+
+- confirm a visible CI run that includes the documentation test module.
 
 Definition of Done:
 
