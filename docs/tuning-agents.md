@@ -131,3 +131,7 @@ Decision: integrate, revise, defer, or reject.
 ```
 
 This review record is process guidance. TIP records remain the protocol artifact for transition reasoning.
+
+## Applied review
+
+The first complete application is recorded in [`reviews/epic-2.2-contract-tuning.md`](reviews/epic-2.2-contract-tuning.md).
