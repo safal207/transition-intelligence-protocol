@@ -18,6 +18,7 @@ DOCUMENTS_WITH_LOCAL_LINKS = (
     ROOT / "protocols" / "ifp" / "tip-handoff.md",
     ROOT / "docs" / "cli.md",
     ROOT / "docs" / "validation.md",
+    ROOT / "docs" / "tuning-agents.md",
 )
 
 COMMAND_SURFACES = (
@@ -25,6 +26,30 @@ COMMAND_SURFACES = (
     ROOT / "docs" / "cli.md",
     ROOT / "docs" / "validation.md",
     ROOT / ".github" / "workflows" / "validate.yml",
+)
+
+CONTRACT_SURFACES = (
+    ROOT / "README.md",
+    ROOT / "spec" / "v0.1.md",
+    ROOT / "protocols" / "ifp" / "spec.md",
+    ROOT / "protocols" / "ifp" / "tip-handoff.md",
+)
+
+CANONICAL_BOUNDARIES = (
+    "IFP establishes readiness; TIP reasons about transitions.",
+    "IFP is optional when the TIP starting state is already trusted and sufficient.",
+    "When IFP supplies the TIP starting state, the explicit handoff contract is required.",
+    "The handoff is an interface contract, not a third protocol.",
+)
+
+TUNING_AGENTS = (
+    "Idea Analyst",
+    "Project Analyst",
+    "Implementation Analyst",
+    "Customer Advocate",
+    "Repository Reviewer",
+    "Stabilizer",
+    "Innovator",
 )
 
 CANONICAL_COMMANDS = (
@@ -56,6 +81,7 @@ RELEASE_ARTIFACTS = (
     "tip/validator.py",
     "tip/ifp_validator.py",
     "tip/handoff_validator.py",
+    "docs/tuning-agents.md",
     ".github/workflows/validate.yml",
 )
 
@@ -65,6 +91,7 @@ README_STRUCTURE_PATHS = (
     "tests/test_handoff_validator.py",
     "tests/test_documentation.py",
     "examples/json/bounded-learning-pilot.tip.json",
+    "docs/tuning-agents.md",
 )
 
 MARKDOWN_LINK_PATTERN = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
@@ -121,6 +148,29 @@ class DocumentationConsistencyTests(unittest.TestCase):
                         normalized,
                         f"{surface}: missing or stale canonical command: {command}",
                     )
+
+    def test_protocol_boundary_language_is_canonical(self) -> None:
+        for surface in CONTRACT_SURFACES:
+            with self.subTest(surface=surface.relative_to(ROOT)):
+                text = surface.read_text(encoding="utf-8")
+                for boundary in CANONICAL_BOUNDARIES:
+                    self.assertIn(
+                        boundary,
+                        text,
+                        f"{surface}: missing canonical protocol boundary: {boundary}",
+                    )
+
+    def test_tuning_agents_are_complete_and_bounded(self) -> None:
+        path = ROOT / "docs" / "tuning-agents.md"
+        text = path.read_text(encoding="utf-8")
+
+        for agent in TUNING_AGENTS:
+            with self.subTest(agent=agent):
+                self.assertIn(agent, text)
+
+        self.assertIn("They are not new protocols", text)
+        self.assertIn("A maintainer remains responsible for the final decision.", text)
+        self.assertIn("cannot override protocol boundaries", text)
 
     def test_handoff_surfaces_reference_the_canonical_example(self) -> None:
         surfaces = (
