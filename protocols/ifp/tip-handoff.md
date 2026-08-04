@@ -4,7 +4,14 @@
 
 The handoff connects one verified Initialization Feedback Protocol record to one Transition Intelligence Protocol record.
 
-It is an interface contract, not a third protocol.
+## Canonical boundaries
+
+- IFP establishes readiness; TIP reasons about transitions.
+- IFP is optional when the TIP starting state is already trusted and sufficient.
+- When IFP supplies the TIP starting state, the explicit handoff contract is required.
+- The handoff is an interface contract, not a third protocol.
+
+The handoff applies when a TIP record uses a starting state produced by IFP. A standalone TIP record with an independently trusted and sufficient state does not require an artificial handoff.
 
 ```text
 IFP Record
@@ -20,7 +27,7 @@ TIP Record
 
 ## Why the handoff is explicit
 
-Without an explicit handoff, a TIP record may claim a starting state without showing where that state came from.
+When IFP supplies the source state, the handoff shows that the exact checked ready state became the exact state used for TIP transition reasoning.
 
 The handoff preserves:
 
@@ -29,6 +36,8 @@ The handoff preserves:
 - the ready state produced by IFP;
 - the state consumed by TIP;
 - evidence used to verify the mapping.
+
+The handoff establishes starting-state provenance. It does not decide the transition, recommend an action, or replace TIP validation.
 
 ## Required checks
 
