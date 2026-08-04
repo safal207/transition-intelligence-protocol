@@ -99,7 +99,7 @@ python -m tip validate-handoff \
   --tip examples/json/repository-next-step.tip.json
 ```
 
-Run validator self-tests:
+Run validator and documentation consistency tests:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -188,6 +188,7 @@ transition-intelligence-protocol/
     test_validator.py
     test_ifp_validator.py
     test_handoff_validator.py
+    test_documentation.py
   docs/
     cli.md
     validation.md
@@ -197,12 +198,12 @@ transition-intelligence-protocol/
 
 ## Assurance rule
 
-A semantic rule is added only together with a negative test that proves the validator can detect its violation.
+A semantic or documentation rule is added only together with a negative test or repository assertion that proves drift can be detected.
 
 ```text
 new rule
--> negative case
--> expected failure assertion
+-> negative case or consistency assertion
+-> expected failure
 -> CI execution
 ```
 
@@ -217,6 +218,7 @@ Current focus:
 - preserve explicit provenance from IFP readiness into TIP state reasoning;
 - preserve confidence provenance before a value can authorize committed action;
 - close the action-to-review loop without claiming more causality than the evidence supports;
+- keep canonical documentation links and commands synchronized with executable behavior;
 - avoid splitting protocols into separate repositories before their interfaces stabilize.
 
 ## License
