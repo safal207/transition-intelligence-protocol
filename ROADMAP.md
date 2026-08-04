@@ -13,7 +13,9 @@ Completed:
 - dependency-free validators;
 - command-line validation for files and directories;
 - validator self-tests with negative cases;
-- documentation consistency tests for local links, canonical commands, handoff references, and release artifacts;
+- documentation consistency tests for local links, canonical commands, handoff references, release artifacts, and protocol boundaries;
+- canonical contract language across README, IFP spec, TIP spec, and handoff spec;
+- seven bounded implementation-tuning lenses for idea, project, implementation, customer, repository, stabilization, and innovation review;
 - GitHub Actions workflow;
 - explicit IFP-to-TIP handoff record;
 - cross-record handoff validation;
@@ -44,6 +46,7 @@ Release scope:
 - `tip/validator.py`;
 - `tip/ifp_validator.py`;
 - `tip/handoff_validator.py`;
+- `docs/tuning-agents.md`;
 - validator and documentation consistency tests;
 - `.github/workflows/validate.yml`.
 
