@@ -13,6 +13,7 @@ Completed:
 - dependency-free validators;
 - command-line validation for files and directories;
 - validator self-tests with negative cases;
+- documentation consistency tests for local links, canonical commands, handoff references, and release artifacts;
 - GitHub Actions workflow;
 - explicit IFP-to-TIP handoff record;
 - cross-record handoff validation;
@@ -46,13 +47,12 @@ Release scope:
 - validator and documentation consistency tests;
 - `.github/workflows/validate.yml`.
 
-### v0.2 Documentation and CLI quality
+### v0.2 CLI quality
 
-Keep human-facing instructions synchronized with executable behavior.
+Make validation easier for humans, CI, and future agents without changing the protocol boundary.
 
 Planned capabilities:
 
-- documentation link and canonical-command consistency tests;
 - machine-readable CLI output;
 - stable error codes;
 - recursive directory validation;
