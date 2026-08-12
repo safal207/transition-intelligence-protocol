@@ -1,6 +1,6 @@
 # Transition Intelligence Protocol — v0.1-draft Release Notes
 
-Status: release marker ready; tag or GitHub Release still to be created.
+Status: Published as GitHub Release `v0.1-draft` from validated commit `a66adf7f087f4529a4212816ffedf67f5c41e30f`.
 
 ## What this draft establishes
 
@@ -107,4 +107,4 @@ The next practical work is CLI quality and real-world calibration:
 
 ## Release marker
 
-The repository is ready for a `v0.1-draft` tag or GitHub Release after the release-preparation commit itself receives a successful `Validate protocol family` run.
+GitHub Release `v0.1-draft` is published from validated commit `a66adf7f087f4529a4212816ffedf67f5c41e30f`: https://github.com/safal207/transition-intelligence-protocol/releases/tag/v0.1-draft

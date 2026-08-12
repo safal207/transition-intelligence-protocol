@@ -225,23 +225,20 @@ Definition of Done:
 
 ### 5.2 Create v0.1-draft marker
 
-Status: Ready — marker creation pending
+Status: Done
 
 Completed:
 
 - implementation head `10bb5c77adeecea1a229657c18238d87a3ffc174` passed workflow run `30923751747`;
 - release-preparation head `f298ba3a71ad8a4437507162b7fd7ab143d04107` passed workflow run `31584460771`;
-- release notes and README now describe the v0.1-draft checkpoint and marker rule.
-
-Remaining task:
-
-- create tag or GitHub Release `v0.1-draft` pointing to a green release-preparation commit.
+- release automation head `a66adf7f087f4529a4212816ffedf67f5c41e30f` passed workflow run `31586895835`;
+- GitHub Release `v0.1-draft` was published from validated commit `a66adf7f087f4529a4212816ffedf67f5c41e30f`;
+- release notes and repository documentation identify the same v0.1-draft scope.
 
 Definition of Done:
 
 - the marker points to a green `main` commit;
 - release notes and marker identify the same v0.1-draft scope.
-
 ## Discovery — Human memory representation
 
 Status: Research only

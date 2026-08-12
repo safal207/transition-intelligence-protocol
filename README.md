@@ -2,6 +2,8 @@
 
 [![Validate protocol family](https://github.com/safal207/transition-intelligence-protocol/actions/workflows/validate.yml/badge.svg)](https://github.com/safal207/transition-intelligence-protocol/actions/workflows/validate.yml)
 
+**Latest stable checkpoint:** [`v0.1-draft`](https://github.com/safal207/transition-intelligence-protocol/releases/tag/v0.1-draft) — first validated protocol-family release.
+
 **Transition Intelligence Protocol** is a framework for reasoning about state, tension, cause, transition, cooperation, action, and the observed result of a reviewed action.
 
 ```text
