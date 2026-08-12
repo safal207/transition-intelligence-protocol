@@ -225,13 +225,17 @@ Definition of Done:
 
 ### 5.2 Create v0.1-draft marker
 
-Status: Ready — release-preparation CI pending
+Status: Ready — marker creation pending
 
-Tasks:
+Completed:
 
-- confirm the validation workflow succeeds on the release-preparation head containing `RELEASE_NOTES.md` and backlog/roadmap updates;
-- create tag or GitHub Release `v0.1-draft`;
-- link the release marker from README or roadmap.
+- implementation head `10bb5c77adeecea1a229657c18238d87a3ffc174` passed workflow run `30923751747`;
+- release-preparation head `f298ba3a71ad8a4437507162b7fd7ab143d04107` passed workflow run `31584460771`;
+- release notes and README now describe the v0.1-draft checkpoint and marker rule.
+
+Remaining task:
+
+- create tag or GitHub Release `v0.1-draft` pointing to a green release-preparation commit.
 
 Definition of Done:
 
