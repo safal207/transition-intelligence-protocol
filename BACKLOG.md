@@ -48,7 +48,7 @@ Definition of Done:
 
 ### 1.2 Add more semantic invariants
 
-Status: In progress — implementation complete, visible CI confirmation pending
+Status: Done
 
 Completed:
 
@@ -79,16 +79,14 @@ Completed:
 - a true human-confirmation flag requires a named `human_confirmer` so responsibility is inspectable;
 - bounded reversible pilots may use AI assessment without pretending that the estimate is human-confirmed;
 - negative tests cover missing provenance, missing alternatives, missing calibration evidence, anonymous confirmation, missing consequence coordinates, and missing human confirmation;
-- positive tests cover human-confirmed high-consequence action and bounded AI-assessed experimentation.
-
-Remaining task:
-
-- confirm a visible CI run for the completed invariant set.
+- positive tests cover human-confirmed high-consequence action and bounded AI-assessed experimentation;
+- GitHub Actions run `30923751747` completed successfully on `main` for implementation commit `10bb5c77adeecea1a229657c18238d87a3ffc174`.
 
 Definition of Done:
 
 - every new invariant has a negative test;
-- each error message names the failing protocol path.
+- each error message names the failing protocol path;
+- the completed invariant set passes the repository validation workflow.
 
 ## Epic 2 — Documentation and schema consistency
 
@@ -96,7 +94,7 @@ Goal: prevent README, specs, schemas, examples, validators, and CI from drifting
 
 ### 2.1 Add documentation consistency tests
 
-Status: In progress — implementation complete, visible CI confirmation pending
+Status: Done
 
 Completed:
 
@@ -108,20 +106,17 @@ Completed:
 - README structure entries are checked for canonical validators, tests, examples, and tuning guidance;
 - canonical protocol-boundary language is checked across README, IFP spec, TIP spec, and handoff spec;
 - the seven tuning agents and their authority limits are checked in `docs/tuning-agents.md`;
-- deliberate broken-link and stale-command mutations were rejected before the clean suite passed again.
-
-Remaining task:
-
-- confirm a visible CI run that includes the documentation test module.
+- deliberate broken-link and stale-command mutations were rejected before the clean suite passed again;
+- GitHub Actions run `30923751747` completed successfully with the documentation consistency module included.
 
 Definition of Done:
 
 - broken links or stale canonical commands fail tests;
-- docs consistency tests run in CI.
+- docs consistency tests run successfully in CI.
 
 ### 2.2 Consolidate protocol contract language
 
-Status: In progress — implementation complete, visible CI confirmation pending
+Status: Done
 
 Completed:
 
@@ -134,15 +129,13 @@ Completed:
 - duplicate handoff record guidance was removed from the IFP specification in favor of the canonical handoff contract;
 - README, IFP spec, TIP spec, and handoff spec use the same four canonical boundary statements;
 - `docs/tuning-agents.md` defines Idea, Project, Implementation, Customer, Repository, Stabilizer, and Innovator review lenses without creating new protocol authority;
-- documentation tests fail when a canonical boundary or tuning-agent limit drifts.
-
-Remaining task:
-
-- confirm a visible CI run for the consolidated contract language.
+- documentation tests fail when a canonical boundary or tuning-agent limit drifts;
+- GitHub Actions run `30923751747` completed successfully for the consolidated contract language.
 
 Definition of Done:
 
-- README, IFP spec, TIP spec, and handoff spec use the same boundaries.
+- README, IFP spec, TIP spec, and handoff spec use the same boundaries;
+- those boundaries are protected by repository assertions and passing CI.
 
 ## Epic 3 — CLI usability
 
@@ -216,27 +209,34 @@ Goal: prepare a trustworthy v0.1-draft marker.
 
 ### 5.1 Add changelog or release notes
 
-Status: Planned
+Status: Done
 
-Tasks:
+Completed:
 
-- add `CHANGELOG.md` or `RELEASE_NOTES.md`;
-- document v0.1-draft scope;
-- list current limitations honestly.
+- added `RELEASE_NOTES.md`;
+- documented v0.1-draft scope and canonical protocol boundaries;
+- recorded the successful implementation validation run and commit;
+- listed current limitations without claiming signed provenance, universal confidence calibration, or external evidence verification;
+- recorded the next practical CLI and calibration work.
 
 Definition of Done:
 
-- release notes match README, roadmap, schemas, examples, and CI.
+- release notes match README, roadmap, schemas, examples, and validated implementation scope.
 
 ### 5.2 Create v0.1-draft marker
 
-Status: Blocked until visible CI success
+Status: Ready — release-preparation CI pending
 
 Tasks:
 
-- verify workflow success on `main`;
-- create tag or release marker;
-- link release marker from README or roadmap.
+- confirm the validation workflow succeeds on the release-preparation head containing `RELEASE_NOTES.md` and backlog/roadmap updates;
+- create tag or GitHub Release `v0.1-draft`;
+- link the release marker from README or roadmap.
+
+Definition of Done:
+
+- the marker points to a green `main` commit;
+- release notes and marker identify the same v0.1-draft scope.
 
 ## Discovery — Human memory representation
 
