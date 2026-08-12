@@ -22,16 +22,19 @@ Completed:
 - repository-relative file evidence checks for handoff bundles;
 - reviewed TIP records with observed outcomes and next states;
 - causal space-time guards for impact scope, feedback latency, reversibility, and review timing;
-- confidence provenance with named assessors, alternatives, calibration references, and human escalation for high-consequence commitments.
+- confidence provenance with named assessors, alternatives, calibration references, and human escalation for high-consequence commitments;
+- successful `Validate protocol family` run `30923751747` on implementation commit `10bb5c77adeecea1a229657c18238d87a3ffc174`;
+- `RELEASE_NOTES.md` for the v0.1-draft checkpoint.
 
 ## Next milestones
 
 ### v0.1-draft release marker
 
-Create a public release or tag after the validation workflow is visibly successful on `main`.
+Status: release preparation committed; create the marker after the release-preparation head itself is green on `main`.
 
 Release scope:
 
+- `RELEASE_NOTES.md`;
 - `spec/v0.1.md`;
 - `protocols/ifp/spec.md`;
 - `protocols/ifp/tip-handoff.md`;
@@ -49,6 +52,14 @@ Release scope:
 - `docs/tuning-agents.md`;
 - validator and documentation consistency tests;
 - `.github/workflows/validate.yml`.
+
+Marker rule:
+
+```text
+release-preparation main commit
+-> Validate protocol family = success
+-> v0.1-draft tag or GitHub Release
+```
 
 ### v0.2 CLI quality
 
