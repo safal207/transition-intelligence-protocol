@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   publish:
@@ -25,8 +26,7 @@ jobs:
       - name: Bind bookkeeping to validated head
         env:
           VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          test "$(git rev-parse HEAD)" = "$VALIDATED_SHA"
+        run: test "$(git rev-parse HEAD)" = "$VALIDATED_SHA"
 
       - name: Publish v0.1-draft when absent
         env:
@@ -45,7 +45,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          RELEASE_TARGET="$(gh release view v0.1-draft --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish)"
+          export RELEASE_TARGET="$(gh release view v0.1-draft --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish)"
           python - <<'PY'
           from pathlib import Path
           import os
@@ -101,8 +101,11 @@ Definition of Done:
           marker = "**Latest stable checkpoint:**"
           line = f"**Latest stable checkpoint:** [`v0.1-draft`]({release_url}) — first validated protocol-family release.\n\n"
           if marker not in text:
-              anchor = "**Transition Intelligence Protocol** is a framework"
-              text = text.replace(anchor, line + anchor, 1)
+              text = text.replace(
+                  "**Transition Intelligence Protocol** is a framework",
+                  line + "**Transition Intelligence Protocol** is a framework",
+                  1,
+              )
           readme.write_text(text, encoding="utf-8")
 
           roadmap = Path("ROADMAP.md")
@@ -113,12 +116,22 @@ Definition of Done:
           )
           roadmap.write_text(text, encoding="utf-8")
           PY
-        env:
-          RELEASE_TARGET: ${{ env.RELEASE_TARGET }}
+
+      - name: Validate bookkeeping candidate
+        run: |
+          python -m tip validate examples/json/
+          python -m tip validate-ifp examples/ifp/
+          python -m tip validate-handoff \
+            examples/handoff/project-to-next-step.handoff.json \
+            --ifp examples/ifp/project-initialization.ifp.json \
+            --tip examples/json/repository-next-step.tip.json
+          python -m unittest discover -s tests -v
 
       - name: Commit bookkeeping when changed
+        id: bookkeeping
         run: |
           if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -126,8 +139,15 @@ Definition of Done:
           git add BACKLOG.md README.md ROADMAP.md RELEASE_NOTES.md
           git commit -m "Close v0.1-draft release marker"
           git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Synchronize GitHub Release notes
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit v0.1-draft --repo "$GITHUB_REPOSITORY" --notes-file RELEASE_NOTES.md
+
+      - name: Validate committed bookkeeping head
+        if: steps.bookkeeping.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run validate.yml --repo "$GITHUB_REPOSITORY" --ref main
