@@ -122,6 +122,12 @@ python scripts/validate_examples.py
 
 See [`docs/validation.md`](docs/validation.md) and [`docs/cli.md`](docs/cli.md).
 
+## v0.1-draft checkpoint
+
+Release scope and current limitations are recorded in [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
+
+The release marker is created only from a `main` commit whose `Validate protocol family` workflow succeeds. This keeps the public marker tied to the same executable checks described by the repository.
+
 ## Intellectual frame
 
 The project is inspired by:
@@ -172,6 +178,7 @@ transition-intelligence-protocol/
   README.md
   ROADMAP.md
   BACKLOG.md
+  RELEASE_NOTES.md
   spec/
     v0.1.md
   protocols/
@@ -225,7 +232,7 @@ new rule
 
 ## Status
 
-Early protocol-family foundation.
+v0.1-draft release preparation.
 
 Current focus:
 
@@ -236,7 +243,7 @@ Current focus:
 - close the action-to-review loop without claiming more causality than the evidence supports;
 - keep canonical protocol boundaries, documentation links, and commands synchronized with executable behavior;
 - use tuning agents as bounded review lenses rather than adding new protocols;
-- avoid splitting protocols into separate repositories before their interfaces stabilize.
+- create the v0.1-draft marker only from a green release-preparation `main` commit.
 
 ## License
 
