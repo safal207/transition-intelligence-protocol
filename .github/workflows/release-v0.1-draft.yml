@@ -69,26 +69,27 @@ jobs:
 
           backlog = Path("BACKLOG.md")
           text = backlog.read_text(encoding="utf-8")
-          replacement = f'''### 5.2 Create v0.1-draft marker
-
-Status: Done
-
-Completed:
-
-- implementation head `10bb5c77adeecea1a229657c18238d87a3ffc174` passed workflow run `30923751747`;
-- release-preparation head `f298ba3a71ad8a4437507162b7fd7ab143d04107` passed workflow run `31584460771`;
-- release automation head `a66adf7f087f4529a4212816ffedf67f5c41e30f` passed workflow run `31586895835`;
-- GitHub Release `v0.1-draft` was published from validated commit `{release_target}`;
-- release notes and repository documentation identify the same v0.1-draft scope.
-
-Definition of Done:
-
-- the marker points to a green `main` commit;
-- release notes and marker identify the same v0.1-draft scope.
-'''
+          replacement = "\n".join([
+              "### 5.2 Create v0.1-draft marker",
+              "",
+              "Status: Done",
+              "",
+              "Completed:",
+              "",
+              "- implementation head `10bb5c77adeecea1a229657c18238d87a3ffc174` passed workflow run `30923751747`;",
+              "- release-preparation head `f298ba3a71ad8a4437507162b7fd7ab143d04107` passed workflow run `31584460771`;",
+              "- release automation head `a66adf7f087f4529a4212816ffedf67f5c41e30f` passed workflow run `31586895835`;",
+              f"- GitHub Release `v0.1-draft` was published from validated commit `{release_target}`;",
+              "- release notes and repository documentation identify the same v0.1-draft scope.",
+              "",
+              "Definition of Done:",
+              "",
+              "- the marker points to a green `main` commit;",
+              "- release notes and marker identify the same v0.1-draft scope.",
+          ])
           text, count = re.subn(
               r"### 5\.2 Create v0\.1-draft marker\n.*?(?=\n## Discovery — Human memory representation)",
-              replacement.rstrip(),
+              replacement,
               text,
               flags=re.S,
           )
