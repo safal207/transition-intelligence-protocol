@@ -1,0 +1,46 @@
+name: Publish v0.1-draft
+
+on:
+  workflow_run:
+    workflows: ["Validate protocol family"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check whether v0.1-draft already exists
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v0.1-draft --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout validated commit
+        if: steps.release.outputs.exists != 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Publish v0.1-draft release
+        if: steps.release.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: >-
+          gh release create v0.1-draft
+          --repo "$GITHUB_REPOSITORY"
+          --target "$VALIDATED_SHA"
+          --title "Transition Intelligence Protocol v0.1-draft"
+          --notes-file RELEASE_NOTES.md
