@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -81,7 +80,7 @@ def _resolve_evidence_file(
     if resolved.suffix.lower() == ".json":
         try:
             load_json(resolved)
-        except (OSError, json.JSONDecodeError) as exc:
+        except (OSError, ValueError) as exc:
             return None, f"referenced JSON file is invalid: {exc}"
 
     return resolved, None
@@ -132,7 +131,7 @@ def validate_handoff_evidence(
 def validate_handoff_file(path: Path, schema: dict[str, Any]) -> ValidationResult:
     try:
         data = load_json(path)
-    except (OSError, json.JSONDecodeError) as exc:
+    except (OSError, ValueError) as exc:
         return ValidationResult(path, [f"$: unable to read valid JSON: {exc}"])
 
     errors = validate_schema_subset(schema, data)

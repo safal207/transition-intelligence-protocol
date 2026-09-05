@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -30,9 +31,52 @@ class ValidationResult:
         return not self.errors
 
 
+class InvalidJSONError(ValueError):
+    """A JSON document that TIP refuses to admit.
+
+    Raised for documents that ``json`` would accept but that carry values TIP
+    cannot reason about: the non-standard ``NaN``/``Infinity``/``-Infinity``
+    literals, and numeric tokens that overflow to infinity (``1e309``).
+    NaN makes ordered comparisons false; reject non-finite numeric input
+    before it reaches confidence bounds or low-confidence rules.
+    """
+
+
+def _reject_constant(token: str) -> Any:
+    raise InvalidJSONError(
+        f"non-standard JSON literal {token!r} is not accepted; "
+        "numbers must be finite"
+    )
+
+
+def _parse_float(token: str) -> float:
+    value = float(token)
+    if not math.isfinite(value):
+        raise InvalidJSONError(
+            f"numeric literal {token!r} is not a finite number"
+        )
+    return value
+
+
+def loads_json(text: str) -> Any:
+    """Parse JSON text under TIP's numeric admission rules."""
+
+    return json.loads(
+        text,
+        parse_constant=_reject_constant,
+        parse_float=_parse_float,
+    )
+
+
 def load_json(path: Path) -> Any:
+    """Shared JSON ingress for TIP, IFP and handoff records and schemas.
+
+    Raises ``ValueError`` (``json.JSONDecodeError`` or ``InvalidJSONError``) for
+    malformed or non-finite documents, and ``OSError`` for unreadable paths.
+    """
+
     with path.open("r", encoding="utf-8") as file:
-        return json.load(file)
+        return loads_json(file.read())
 
 
 def _matches_type(value: Any, expected_type: str) -> bool:
@@ -80,6 +124,13 @@ def validate_schema_subset(
         errors.append(f"{path}: value {data!r} is not in {enum_values}")
 
     if isinstance(data, (int, float)) and not isinstance(data, bool):
+        # Guard the in-memory API too: a caller can hand us float('nan') directly.
+        # isinstance(data, int) values are always finite, and math.isfinite() would
+        # raise OverflowError on a very large int, so only floats are checked.
+        if isinstance(data, float) and not math.isfinite(data):
+            errors.append(f"{path}: value {data!r} is not a finite number")
+            return errors
+
         minimum = schema.get("minimum")
         maximum = schema.get("maximum")
         if minimum is not None and data < minimum:
@@ -281,7 +332,7 @@ def discover_tip_files(target: Path) -> list[Path]:
 def validate_file(path: Path, schema: dict[str, Any]) -> ValidationResult:
     try:
         data = load_json(path)
-    except (OSError, json.JSONDecodeError) as exc:
+    except (OSError, ValueError) as exc:
         return ValidationResult(path, [f"$: unable to read valid JSON: {exc}"])
 
     errors = validate_schema_subset(schema, data)
