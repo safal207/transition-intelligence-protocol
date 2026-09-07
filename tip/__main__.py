@@ -124,6 +124,11 @@ def run_validation(target: Path, schema: Path, validator: Validator) -> int:
     except FileNotFoundError as exc:
         print(f"FAIL {exc}")
         return 1
+    except (OSError, ValueError) as exc:
+        # Unreadable, malformed or non-finite JSON: fail cleanly, no traceback.
+        print(f"FAIL {target}")
+        print(f"  - {exc}")
+        return 1
 
     return print_results(results)
 
@@ -147,6 +152,10 @@ def run_handoff_validation(
         )
     except FileNotFoundError as exc:
         print(f"FAIL {exc}")
+        return 1
+    except (OSError, ValueError) as exc:
+        print(f"FAIL {handoff_record}")
+        print(f"  - {exc}")
         return 1
 
     return print_results([result])

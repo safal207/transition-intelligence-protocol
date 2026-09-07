@@ -88,6 +88,38 @@ python -m tip validate-handoff \
 python -m unittest discover -s tests -v
 ```
 
+## Numeric admission
+
+The shared JSON ingress in `tip/validator.py` (`load_json` / `loads_json`, used
+for TIP, IFP and handoff records, JSON file evidence and schema files) rejects
+`NaN`, `Infinity`, `-Infinity`, and numeric tokens that overflow to infinity,
+such as `1e309` and `-1e309`. These raise `InvalidJSONError` (a `ValueError`).
+Record and CLI error handlers report a failed validation rather than allowing
+the parse error to be mistaken for an accepted record.
+
+`NaN < 0.5` and `NaN > 1` are both false. Before this admission rule, NaN
+confidence could evade both the range bounds and the low-confidence branch.
+Infinity is also rejected at ingress, although unlike NaN it is ordered and
+would already fail a finite confidence bound.
+
+`validate_schema_subset` rejects non-finite floats supplied directly from
+Python too. Finiteness is checked only for floats: Python integers are finite,
+and passing an arbitrarily large integer to `math.isfinite` can overflow.
+
+JSON admission still accepts finite values such as `0`, `0.5`, `1` and `1e308`.
+Schema and semantic checks remain separate: confidence is still limited to
+0 through 1, so `1e308` is not a valid confidence. Quoted strings like `"NaN"`
+remain strings, but do not satisfy a numeric confidence field.
+
+`tests/test_numeric_admission.py` checks ingress, in-memory numeric validation
+and CLI behavior. `tests/test_numeric_entrypoints.py` additionally exercises
+TIP, IFP, handoff, schema-loading and JSON-evidence entry points, including
+invalid UTF-8 and clean CLI failures. These tests are discovered by the existing
+workflow; no new runtime dependency is introduced.
+
+These checks validate numeric representation, not the accuracy or calibration
+of an assessor's confidence and not authorization to execute an action.
+
 ## Known limits
 
 The validators implement a focused subset of JSON Schema.
